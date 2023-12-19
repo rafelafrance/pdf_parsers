@@ -16,31 +16,24 @@ dependencies = [
     "ftfy",
     "lxml",
     "numpy",
-    "pandas",
     "pillow",
     "pytesseract",
     "regex",
     "rich",
     "scikit-image",
     "scipy",
-    "selenium",
-    "spacy",
 ]
 optional-dependencies.dev = [
-    "autopep8",
     "bandit",
     "black",
-    "ipyparallel",
-    "ipython",
     "isort",
     "neovim",
     "pre-commit",
     "pre-commit-hooks",
     "pydocstyle",
     "pylint",
-    "pyright",
     "python-lsp-server[all]",
-    "yapf",
+    "ruff",
 ]
 
 [tool.isort]
@@ -114,4 +107,3 @@ disable = [
     "too-few-public-methods",           # "R0903"
     "too-many-arguments",               # "R0913"
 ]
-
