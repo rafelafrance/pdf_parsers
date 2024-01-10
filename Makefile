@@ -2,8 +2,8 @@
 .ONESHELL:
 
 VENV=.venv
-BASE=python3.11
-PYTHON=./$(VENV)/bin/$(BASE)
+PY_VER=python3.11
+PYTHON=./$(VENV)/bin/$(PY_VER)
 PIP_INSTALL=$(PYTHON) -m pip install
 
 test:
@@ -21,7 +21,7 @@ dev: venv
 	pre-commit install
 
 venv:
-	test -d $(VENV) || $(BASE) -m venv $(VENV)
+	test -d $(VENV) || $(PY_VER) -m venv $(VENV)
 
 clean:
 	rm -r $(VENV)
