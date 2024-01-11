@@ -5,7 +5,6 @@ from dataclasses import dataclass, field
 from itertools import cycle
 from pathlib import Path
 from tkinter import filedialog, messagebox
-from typing import Optional
 
 import customtkinter as ctk
 from PIL import Image, ImageTk
@@ -15,6 +14,8 @@ COLORS = """ red blue green black purple orange cyan olive gray pink """.split()
 
 
 COORDS = tuple[int, int, int, int]
+
+TOO_SMALL = 20
 
 
 @dataclass
@@ -31,16 +32,12 @@ class Box:
         return {"x0": x0, "y0": y0, "x1": x1, "y1": y1, "start": self.start}
 
     def too_small(self) -> bool:
-        if abs(self.x1 - self.x0) < 20 or abs(self.y1 - self.y0) < 20:
-            return True
-        return False
+        return abs(self.x1 - self.x0) < TOO_SMALL or abs(self.y1 - self.y0) < TOO_SMALL
 
     def point_hit(self, x, y) -> bool:
         x0, x1 = (self.x0, self.x1) if self.x1 > self.x0 else (self.x1, self.x0)
         y0, y1 = (self.y0, self.y1) if self.y1 > self.y0 else (self.y1, self.y0)
-        if x0 <= x <= x1 and y0 <= y <= y1:
-            return True
-        return False
+        return x0 <= x <= x1 and y0 <= y <= y1
 
     def restore_coords(self, image_height: int, photo_height: int) -> COORDS:
         ratio = image_height / photo_height
@@ -87,12 +84,12 @@ class Page:
         for box in self.boxes:
             if x is not None and box.point_hit(x, y):
                 continue
-            elif x is None and box.too_small():
+            if x is None and box.too_small():
                 continue
             new.append(box)
         self.boxes = new
 
-    def find(self, x, y) -> Optional[Box]:
+    def find(self, x, y) -> Box | None:
         for box in self.boxes:
             if box.point_hit(x, y):
                 return box
@@ -284,11 +281,9 @@ class App(ctk.CTk):
         self.curr_dir = path.parent
         self.dirty = False
 
-        output = []
-        for page in self.pages:
-            output.append(page.as_dict())
+        output = [p.as_dict() for p in self.pages]
 
-        with open(path, "w") as out_json:
+        with path.open("w") as out_json:
             json.dump(output, out_json, indent=4)
 
     def load(self):
@@ -307,7 +302,7 @@ class App(ctk.CTk):
             self.setup_canvas()
         canvas_height = self.image_frame.winfo_height()
 
-        with open(path) as in_json:
+        with path.open() as in_json:
             json_pages = json.load(in_json)
 
         self.dirty = False
@@ -363,10 +358,11 @@ class App(ctk.CTk):
         self.colors = cycle(COLORS)
         self.dirty = False
 
-        paths = []
-        for path in sorted(self.image_dir.glob("*")):
-            if path.suffix.lower() in (".png", ".jpg", "jpeg", ".tiff"):
-                paths.append(path)
+        paths = [
+            p
+            for p in sorted(self.image_dir.glob("*"))
+            if p.suffix.lower() in (".png", ".jpg", "jpeg", ".tiff")
+        ]
 
         if paths:
             paths = sorted(p.name for p in paths)

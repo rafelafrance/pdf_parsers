@@ -5,7 +5,6 @@ import textwrap
 from pathlib import Path
 
 import rich
-
 from util.pylib import log
 
 
@@ -15,10 +14,7 @@ def main():
 
     pdf_to_images(args)
 
-    msg = " ".join(
-        """You may now want to remove pages that
-        do not contain useful traits.""".split(),
-    )
+    msg = "You may now want to remove pages that do not contain useful traits."
     rich.print(f"\n[bold yellow]{msg}[/bold yellow]\n")
 
     log.finished()

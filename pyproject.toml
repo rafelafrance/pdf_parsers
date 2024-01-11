@@ -5,6 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pdf_parsers"
 version = "0.1.0"
+readme = "README.md"
 description = "Parse PDFs for information extraction"
 license = {file = "LICENSE"}
 authors = [{name="Raphael LaFrance", email="raphael.lafrance@gmail.com"}]
@@ -16,17 +17,12 @@ dependencies = [
     "ftfy",
     "lxml",
     "numpy",
-    "pandas",
     "pillow",
     "pytesseract",
-    "python-dateutil",
     "regex",
     "rich",
     "scikit-image",
     "scipy",
-    "spacy",
-    "tomlkit",
-    "tqdm",
 ]
 optional-dependencies.dev = [
     "neovim",
@@ -38,22 +34,6 @@ optional-dependencies.dev = [
 
 [tool.setuptools]
 py-modules = []
-
-[tool.common_utils]
-base-dependencies = [
-    "Jinja2",
-    "beautifulsoup4",
-    "customtkinter",
-    "ftfy",
-    "lxml",
-    "numpy",
-    "pillow",
-    "pytesseract",
-    "regex",
-    "rich",
-    "scikit-image",
-    "scipy",
-]
 
 [tool.ruff]
 target-version = "py311"
