@@ -6,7 +6,8 @@ from pathlib import Path
 import rich
 from bs4 import BeautifulSoup
 from pylib.text_assembler import Page, Word, find_lines, page_flow
-from traiter.pylib import log
+
+from util.pylib import log
 
 
 def main():
@@ -28,7 +29,7 @@ def main():
 def xhtml_to_text(args):
     pages = read_xhtml(args.in_xhtml, args.min_y, args.max_y)
 
-    with open(args.out_text, "w") as out_text:
+    with args.out_text.open("w") as out_text:
         for page in pages:
             lines = find_lines(page)
             page.lines = lines if args.gap_min < 1 else page_flow(args, page, lines)
@@ -42,7 +43,7 @@ def xhtml_to_text(args):
 def read_xhtml(in_html, min_y, max_y):
     pages = []
 
-    with open(in_html) as in_html:
+    with in_html.open() as in_html:
         doc = in_html.read()
 
     soup = BeautifulSoup(doc, features="lxml")

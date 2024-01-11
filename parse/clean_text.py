@@ -7,7 +7,9 @@ from pathlib import Path
 import ftfy
 import regex as re
 import rich
-from traiter.pylib import log, sentence_pipeline
+
+from parse.pylib import sentence_pipeline
+from util.pylib import log
 
 MOJIBAKE = {
     "{": "(",
@@ -59,7 +61,7 @@ def main():
 
 
 def clean(args):
-    with open(args.in_text) as raw_file:
+    with args.in_text.open() as raw_file:
         text = raw_file.read()
 
     # The bulk of the text cleaning happens in this function
@@ -76,13 +78,13 @@ def clean(args):
 
     # Write output
     lines = [s.text + "\n" for s in doc.sents if s and s.text]
-    with open(args.out_text, "w") as clean_file:
+    with args.out_text.open("w") as clean_file:
         clean_file.writelines(lines)
 
 
 def clean_text(
     text: str,
-    trans: dict[int, str] = None,
+    trans: dict[int, str] | None = None,
     regexp: re.regex = None,
 ) -> str:
     text = text if text else ""

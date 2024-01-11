@@ -5,7 +5,8 @@ import textwrap
 from pathlib import Path
 
 import rich
-from traiter.pylib import log
+
+from util.pylib import log
 
 
 def main():
@@ -28,8 +29,8 @@ def pdf_to_images(args):
     dir_ = args.image_dir / stem
     dst = dir_ / f"{stem}"
 
-    os.system(f"mkdir -p {dir_}")
-    os.system(f"pdftocairo -jpeg {args.in_pdf} {dst}")
+    os.system(f"mkdir -p {dir_}")  # noqa: S605
+    os.system(f"pdftocairo -jpeg {args.in_pdf} {dst}")  # noqa: S605
 
 
 def parse_args():

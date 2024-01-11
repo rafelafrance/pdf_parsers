@@ -16,12 +16,17 @@ dependencies = [
     "ftfy",
     "lxml",
     "numpy",
+    "pandas",
     "pillow",
     "pytesseract",
+    "python-dateutil",
     "regex",
     "rich",
     "scikit-image",
     "scipy",
+    "spacy",
+    "tomlkit",
+    "tqdm",
 ]
 optional-dependencies.dev = [
     "neovim",
@@ -30,6 +35,9 @@ optional-dependencies.dev = [
     "python-lsp-server[all]",
     "ruff",
 ]
+
+[tool.setuptools]
+py-modules = []
 
 [tool.common_utils]
 base-dependencies = [
@@ -106,6 +114,7 @@ select = [
 ]
 
 ignore = [
+    "COM812",
     "D100",
     "D101",
     "D102",
@@ -115,6 +124,7 @@ ignore = [
     "D107",
     "D203",
     "D212",
+    "ISC001",
     "N818",
     "PD901",
     "PLR0913",

@@ -9,7 +9,8 @@ from PIL import Image
 from pylib import image_transformer as it
 from pylib.ocr import tesseract_engine
 from tqdm import tqdm
-from traiter.pylib import log
+
+from util.pylib import log
 
 
 def main():
@@ -36,7 +37,7 @@ def page_images_to_text(args):
         args.conf,
         args.transform,
     )
-    with open(args.out_text, "w") as out_text:
+    with args.out_text.open("w") as out_text:
         for page in pages:
             lines = ta.find_lines(page)
             page.lines = lines if args.gap_min < 1 else ta.page_flow(args, page, lines)
@@ -61,22 +62,11 @@ def ocr_images(image_dir, min_y, max_y, conf, transform):
         pages.append(page)
         bottom = page.height - max_y
 
-        words = []
-        for frag in tesseract_engine(image):
-            if (
-                frag["bottom"] >= min_y
-                and frag["top"] <= bottom
-                and frag["conf"] >= conf
-            ):
-                words.append(
-                    ta.Word(
-                        frag["left"],
-                        frag["top"],
-                        frag["right"],
-                        frag["bottom"],
-                        frag["text"],
-                    ),
-                )
+        words = [
+            ta.Word(f["left"], f["top"], f["right"], f["bottom"], f["text"])
+            for f in tesseract_engine(image)
+            if f["bottom"] >= min_y and f["top"] <= bottom and f["conf"] >= conf
+        ]
         page.words = sorted(words, key=lambda w: w.x_min)
 
     return pages

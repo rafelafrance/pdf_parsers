@@ -10,7 +10,8 @@ from PIL import Image
 from pylib import image_transformer as it
 from pylib.ocr import tesseract_engine
 from tqdm import tqdm
-from traiter.pylib import log
+
+from util.pylib import log
 
 
 @dataclass
@@ -26,10 +27,10 @@ def main():
     args = parse_args()
     log.started()
 
-    with open(args.in_json) as in_json:
+    with args.in_json.open() as in_json:
         page_data = json.load(in_json)
 
-    with open(args.out_text, "w") as out_text:
+    with args.out_text.open("w") as out_text:
         for json_page in tqdm(page_data):
             if not json_page["boxes"]:
                 continue
@@ -46,18 +47,11 @@ def main():
 
                 page = ta.Page()
 
-                words = []
-                for frag in tesseract_engine(cropped):
-                    if frag["conf"] >= args.conf:
-                        words.append(
-                            ta.Word(
-                                frag["left"],
-                                frag["top"],
-                                frag["right"],
-                                frag["bottom"],
-                                frag["text"],
-                            ),
-                        )
+                words = [
+                    ta.Word(f["left"], f["top"], f["right"], f["bottom"], f["text"])
+                    for f in tesseract_engine(cropped)
+                    if f["conf"] >= args.conf
+                ]
                 page.words = sorted(words, key=lambda w: w.x_min)
                 page.lines = ta.find_lines(page)
 

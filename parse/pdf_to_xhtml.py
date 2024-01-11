@@ -4,7 +4,7 @@ import os
 import textwrap
 from pathlib import Path
 
-from traiter.pylib import log
+from util.pylib import log
 
 
 def main():
@@ -17,7 +17,7 @@ def main():
 
 
 def pdf_to_text(args):
-    os.system(f"pdftotext -bbox -nodiag {args.in_pdf} {args.out_xhtml}")
+    os.system(f"pdftotext -bbox -nodiag {args.in_pdf} {args.out_xhtml}")  # noqa: S605
 
 
 def parse_args():
