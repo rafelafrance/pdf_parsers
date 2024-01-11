@@ -56,7 +56,7 @@ def main():
                                 frag["right"],
                                 frag["bottom"],
                                 frag["text"],
-                            )
+                            ),
                         )
                 page.words = sorted(words, key=lambda w: w.x_min)
                 page.lines = ta.find_lines(page)
@@ -83,7 +83,8 @@ def resize(page, image, box):
 def parse_args():
     description = """Clean text to prepare it for trait extraction."""
     arg_parser = argparse.ArgumentParser(
-        description=textwrap.dedent(description), fromfile_prefix_chars="@"
+        description=textwrap.dedent(description),
+        fromfile_prefix_chars="@",
     )
 
     arg_parser.add_argument(

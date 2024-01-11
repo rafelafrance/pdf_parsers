@@ -1,6 +1,5 @@
 """Convert structured in table-like formats into text in sentences & paragraphs."""
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -70,7 +69,10 @@ def page_flow(args, page, lines):
 
 def find_column_split(line, gap_min, gap_left, gap_right):
     splits = []
-    for i, (prev, curr) in enumerate(zip(line.words[:-1], line.words[1:]), 1):
+    for i, (prev, curr) in enumerate(
+        zip(line.words[:-1], line.words[1:], strict=False),
+        1,
+    ):
         split = curr.x_min - prev.x_max
         x_min = max(prev.x_max, gap_left)
         x_max = min(curr.x_min, gap_right)
@@ -101,7 +103,8 @@ def find_lines(page, vert_overlap=0.3):
 
 
 def find_overlap(line, word, eps=1):
-    """Find the vertical overlap between a line and the word bounding box.
+    """
+    Find the vertical overlap between a line and the word bounding box.
 
     This is a fraction of the smallest height of the line & word bounding box.
     """

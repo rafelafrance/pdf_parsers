@@ -7,8 +7,7 @@ from pathlib import Path
 import ftfy
 import regex as re
 import rich
-from traiter.pylib import log
-from pylib import sentence_pipeline
+from traiter.pylib import log, sentence_pipeline
 
 MOJIBAKE = {
     "{": "(",
@@ -124,7 +123,8 @@ def replace_patterns(regexp: re.regex, text: str) -> str:
 def parse_args():
     description = """Clean text to prepare it for trait extraction."""
     arg_parser = argparse.ArgumentParser(
-        description=textwrap.dedent(description), fromfile_prefix_chars="@"
+        description=textwrap.dedent(description),
+        fromfile_prefix_chars="@",
     )
 
     arg_parser.add_argument(

@@ -8,13 +8,15 @@ class EngineConfig:
         [
             f"-l {tess_lang}",
             f"-c tessedit_char_blacklist='{char_blacklist}'",
-        ]
+        ],
     )
 
 
 def tesseract_engine(image) -> list[dict]:
     df = pytesseract.image_to_data(
-        image, config=EngineConfig.tess_config, output_type="data.frame"
+        image,
+        config=EngineConfig.tess_config,
+        output_type="data.frame",
     )
 
     df = df.loc[df.conf > 0]

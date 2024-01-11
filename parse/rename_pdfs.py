@@ -38,7 +38,8 @@ def parse_args():
         Remove spaces, commas, parentheses, etc. and replace them with underscores _.
         """
     arg_parser = argparse.ArgumentParser(
-        description=textwrap.dedent(description), fromfile_prefix_chars="@"
+        description=textwrap.dedent(description),
+        fromfile_prefix_chars="@",
     )
 
     arg_parser.add_argument(

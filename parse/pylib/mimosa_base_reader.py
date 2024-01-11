@@ -1,8 +1,6 @@
-from collections import defaultdict
-from collections import namedtuple
+from collections import defaultdict, namedtuple
 
-from .. import pipeline
-from .. import sentence_pipeline
+from .. import pipeline, sentence_pipeline
 
 TraitsInText = namedtuple("TraitsInText", "text traits")
 TraitsByTaxon = namedtuple("TraitsByTaxon", "taxon traits")
@@ -46,7 +44,7 @@ class BaseReader:
         self.taxon_traits = defaultdict(list)
 
     def read(self):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @staticmethod
     def read_lines(in_text, limit):

@@ -29,7 +29,8 @@ def parse_args():
     """Process command-line arguments."""
     description = """Fix image numbers."""
     arg_parser = argparse.ArgumentParser(
-        description=textwrap.dedent(description), fromfile_prefix_chars="@"
+        description=textwrap.dedent(description),
+        fromfile_prefix_chars="@",
     )
 
     arg_parser.add_argument(

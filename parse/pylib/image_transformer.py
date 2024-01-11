@@ -73,9 +73,11 @@ def orient(
 
 
 def deskew(
-    image: npt.NDArray, horiz_angles: Optional[npt.NDArray] = None
+    image: npt.NDArray,
+    horiz_angles: Optional[npt.NDArray] = None,
 ) -> npt.NDArray:
-    """Find the skew of the label.
+    """
+    Find the skew of the label.
 
     This method is looking for sharp breaks between the characters and spaces.
     It will work best with binary images.
@@ -130,7 +132,9 @@ def remove_small_holes(
     connectivity: int = 1,
 ) -> npt.NDArray:
     image = morph.remove_small_holes(
-        image, area_threshold=area_threshold, connectivity=connectivity
+        image,
+        area_threshold=area_threshold,
+        connectivity=connectivity,
     )
     return image
 

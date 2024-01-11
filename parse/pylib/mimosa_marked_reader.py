@@ -1,10 +1,10 @@
-"""The algorithms for linking traits to the taxon they describe can get involved. This
+"""
+The algorithms for linking traits to the taxon they describe can get involved. This
 reader looks for treatment header for the taxon. A header a given regular expression
 pattern. The very next taxon is grabbed as the one to associate with the traits.
 """
 import sys
-from enum import auto
-from enum import Enum
+from enum import Enum, auto
 
 import rich
 

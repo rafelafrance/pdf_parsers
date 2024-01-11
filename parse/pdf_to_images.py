@@ -16,7 +16,7 @@ def main():
 
     msg = " ".join(
         """You may now want to remove pages that
-        do not contain useful traits.""".split()
+        do not contain useful traits.""".split(),
     )
     rich.print(f"\n[bold yellow]{msg}[/bold yellow]\n")
 
@@ -33,11 +33,15 @@ def pdf_to_images(args):
 
 
 def parse_args():
-    description = """Convert a PDF file to images (jpg) of pages (one image per page).
-        Note: This will create a subdirectory under the given image directory with
-        a name that matches the PDF file name."""
     arg_parser = argparse.ArgumentParser(
-        description=textwrap.dedent(description), fromfile_prefix_chars="@"
+        fromfile_prefix_chars="@",
+        description=textwrap.dedent(
+            """
+            Convert a PDF file to images (jpg) of pages (one image per page).
+            Note: This will create a subdirectory under the given image directory
+            with a name that matches the PDF file name.
+            """,
+        ),
     )
 
     arg_parser.add_argument(

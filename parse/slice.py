@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
 import json
-from dataclasses import dataclass
-from dataclasses import field
+import tkinter as tk
+from dataclasses import dataclass, field
 from itertools import cycle
 from pathlib import Path
+from tkinter import filedialog, messagebox
 from typing import Optional
 
 import customtkinter as ctk
-import tkinter as tk
-from PIL import Image
-from PIL import ImageTk
+from PIL import Image, ImageTk
 from pylib.spin_box import Spinner
-from tkinter import filedialog
-from tkinter import messagebox
 
 COLORS = """ red blue green black purple orange cyan olive gray pink """.split()
 
@@ -140,7 +137,7 @@ class App(ctk.CTk):
 
         self.title("Slice images for OCR")
 
-        self.grid_rowconfigure((0, 1, 2, 3, 4, 5, 6), weight=0)  # noqa
+        self.grid_rowconfigure((0, 1, 2, 3, 4, 5, 6), weight=0)
         self.grid_rowconfigure(7, weight=1)
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=0)
@@ -149,7 +146,9 @@ class App(ctk.CTk):
         self.image_frame.grid(row=0, column=0, rowspan=self.row_span, sticky="nsew")
 
         self.image_button = ctk.CTkButton(
-            master=self, text="Choose image directory", command=self.get_image_dir
+            master=self,
+            text="Choose image directory",
+            command=self.get_image_dir,
         )
         self.image_button.grid(row=0, column=1, padx=16, pady=16)
 
@@ -157,7 +156,10 @@ class App(ctk.CTk):
         self.load_button.grid(row=1, column=1, padx=16, pady=16)
 
         self.save_button = ctk.CTkButton(
-            master=self, text="Save", command=self.save, state="disabled"
+            master=self,
+            text="Save",
+            command=self.save,
+            state="disabled",
         )
         self.save_button.grid(row=2, column=1, padx=16, pady=16)
 
@@ -167,13 +169,22 @@ class App(ctk.CTk):
         self.action = tk.StringVar()
         self.action.set("add")
         self.radio_add = ctk.CTkRadioButton(
-            master=self, variable=self.action, text="add", value="add"
+            master=self,
+            variable=self.action,
+            text="add",
+            value="add",
         )
         self.radio_del = ctk.CTkRadioButton(
-            master=self, variable=self.action, text="delete", value="delete"
+            master=self,
+            variable=self.action,
+            text="delete",
+            value="delete",
         )
         self.radio_treatment = ctk.CTkRadioButton(
-            master=self, variable=self.action, text="treatment start", value="start"
+            master=self,
+            variable=self.action,
+            text="treatment start",
+            value="start",
         )
         self.radio_add.grid(row=4, column=1, padx=16, pady=16)
         self.radio_del.grid(row=5, column=1, padx=16, pady=16)
@@ -207,7 +218,13 @@ class App(ctk.CTk):
             color = next(self.colors)
             dash = (30, 20) if box.start else ()
             self.canvas.create_rectangle(
-                box.x0, box.y0, box.x1, box.y1, outline=color, width=4, dash=dash
+                box.x0,
+                box.y0,
+                box.x1,
+                box.y1,
+                outline=color,
+                width=4,
+                dash=dash,
             )
 
     def clear_page_boxes(self):
@@ -306,7 +323,8 @@ class App(ctk.CTk):
 
         except KeyError:
             messagebox.showerror(
-                title="Load error", message="Could not load the JSON file"
+                title="Load error",
+                message="Could not load the JSON file",
             )
             self.pages = []
             self.save_button.configure(state="disabled")
@@ -331,7 +349,8 @@ class App(ctk.CTk):
 
     def get_image_dir(self):
         image_dir = filedialog.askdirectory(
-            initialdir=self.curr_dir, title="Choose image directory"
+            initialdir=self.curr_dir,
+            title="Choose image directory",
         )
         if not image_dir:
             return
@@ -374,7 +393,8 @@ class App(ctk.CTk):
     def safe_quit(self):
         if self.dirty:
             yes = messagebox.askyesno(
-                self.title(), "Are you sure you want to exit without saving?"
+                self.title(),
+                "Are you sure you want to exit without saving?",
             )
             if not yes:
                 return

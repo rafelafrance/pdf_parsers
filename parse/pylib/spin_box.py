@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 from typing import Union
 
 import customtkinter as ctk
@@ -22,7 +22,7 @@ class Spinner(ctk.CTkFrame):
         self.low = low
         self.high = high
 
-        self.grid_columnconfigure((0, 2), weight=0)  # noqa
+        self.grid_columnconfigure((0, 2), weight=0)
         self.grid_columnconfigure(1, weight=1)
 
         self.subtract_button = ctk.CTkButton(

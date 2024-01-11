@@ -20,7 +20,7 @@ def main():
 
     msg = " ".join(
         """You may want to remove headers, footers, figure captions, map captions, etc.
-        from this text file.""".split()
+        from this text file.""".split(),
     )
     rich.print(f"\n[bold yellow]{msg}[/bold yellow]\n")
 
@@ -30,7 +30,11 @@ def main():
 def page_images_to_text(args):
     """Convert images of PDF pages into text via OCR."""
     pages = ocr_images(
-        args.image_dir, args.min_y, args.max_y, args.conf, args.transform
+        args.image_dir,
+        args.min_y,
+        args.max_y,
+        args.conf,
+        args.transform,
     )
     with open(args.out_text, "w") as out_text:
         for page in pages:
@@ -71,7 +75,7 @@ def ocr_images(image_dir, min_y, max_y, conf, transform):
                         frag["right"],
                         frag["bottom"],
                         frag["text"],
-                    )
+                    ),
                 )
         page.words = sorted(words, key=lambda w: w.x_min)
 
@@ -82,7 +86,8 @@ def parse_args():
     """Process command-line arguments."""
     description = """Convert images of PDF pages into text via OCR."""
     arg_parser = argparse.ArgumentParser(
-        description=textwrap.dedent(description), fromfile_prefix_chars="@"
+        description=textwrap.dedent(description),
+        fromfile_prefix_chars="@",
     )
 
     arg_parser.add_argument(

@@ -5,10 +5,7 @@ from pathlib import Path
 
 import rich
 from bs4 import BeautifulSoup
-from pylib.text_assembler import find_lines
-from pylib.text_assembler import Page
-from pylib.text_assembler import page_flow
-from pylib.text_assembler import Word
+from pylib.text_assembler import Page, Word, find_lines, page_flow
 from traiter.pylib import log
 
 
@@ -21,7 +18,7 @@ def main():
     msg = " ".join(
         """You may want to remove headers, footers,
         figure captions (& text), map captions (& text), etc.
-        from this text file.""".split()
+        from this text file.""".split(),
     )
     rich.print(f"\n[bold yellow]{msg}[/bold yellow]\n")
 
@@ -74,7 +71,8 @@ def read_xhtml(in_html, min_y, max_y):
 def parse_args():
     description = """Convert an XHTML file with word bounding boxes to text."""
     arg_parser = argparse.ArgumentParser(
-        description=textwrap.dedent(description), fromfile_prefix_chars="@"
+        description=textwrap.dedent(description),
+        fromfile_prefix_chars="@",
     )
 
     arg_parser.add_argument(
