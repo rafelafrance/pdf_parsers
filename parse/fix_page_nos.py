@@ -13,7 +13,7 @@ def main():
     paths = sorted(args.dir.glob(args.glob))
     for src in paths:
         parts = src.stem.split("_")
-        if len(parts) != 2:
+        if len(parts) != 2:  # noqa: PLR2004
             continue
         try:
             _ = int(parts[1])

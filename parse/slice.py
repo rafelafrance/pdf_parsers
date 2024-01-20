@@ -1,122 +1,22 @@
 #!/usr/bin/env python3
 import json
 import tkinter as tk
-from dataclasses import dataclass, field
 from itertools import cycle
 from pathlib import Path
 from tkinter import filedialog, messagebox
+from typing import ClassVar
 
 import customtkinter as ctk
-from PIL import Image, ImageTk
+from pylib.slice_box import Box
+from pylib.slice_page import Page
 from pylib.spin_box import Spinner
-
-COLORS = """ red blue green black purple orange cyan olive gray pink """.split()
-
-
-COORDS = tuple[int, int, int, int]
-
-TOO_SMALL = 20
-
-
-@dataclass
-class Box:
-    id: int = None
-    x0: float = None
-    y0: float = None
-    x1: float = None
-    y1: float = None
-    start: bool = False
-
-    def as_dict(self, image_height: int, photo_height: int) -> dict:
-        x0, y0, x1, y1 = self.restore_coords(image_height, photo_height)
-        return {"x0": x0, "y0": y0, "x1": x1, "y1": y1, "start": self.start}
-
-    def too_small(self) -> bool:
-        return abs(self.x1 - self.x0) < TOO_SMALL or abs(self.y1 - self.y0) < TOO_SMALL
-
-    def point_hit(self, x, y) -> bool:
-        x0, x1 = (self.x0, self.x1) if self.x1 > self.x0 else (self.x1, self.x0)
-        y0, y1 = (self.y0, self.y1) if self.y1 > self.y0 else (self.y1, self.y0)
-        return x0 <= x <= x1 and y0 <= y <= y1
-
-    def restore_coords(self, image_height: int, photo_height: int) -> COORDS:
-        ratio = image_height / photo_height
-        x0 = int(ratio * self.x0)
-        y0 = int(ratio * self.y0)
-        x1 = int(ratio * self.x1)
-        y1 = int(ratio * self.y1)
-        return x0, y0, x1, y1
-
-    def fit_to_canvas(self, image_height: int, canvas_height: int):
-        ratio = canvas_height / image_height
-        self.x0 = int(ratio * self.x0)
-        self.y0 = int(ratio * self.y0)
-        self.x1 = int(ratio * self.x1)
-        self.y1 = int(ratio * self.y1)
-
-
-@dataclass
-class Page:
-    path: Path = None
-    width: int = None
-    height: int = None
-    photo: ImageTk = None
-    boxes: list[Box] = field(default_factory=list)
-
-    def as_dict(self) -> dict:
-        return {
-            "path": str(self.path),
-            "boxes": [b.as_dict(self.height, self.photo.height()) for b in self.boxes],
-        }
-
-    def resize(self, canvas_height):
-        if not self.photo:
-            image = Image.open(self.path)
-            image_width, image_height = image.size
-            ratio = canvas_height / image_height
-            new_width = int(image_width * ratio)
-            new_height = int(image_height * ratio)
-            resized = image.resize((new_width, new_height))
-            self.photo = ImageTk.PhotoImage(resized)
-
-    def filter(self, x=None, y=None):
-        new = []
-        for box in self.boxes:
-            if x is not None and box.point_hit(x, y):
-                continue
-            if x is None and box.too_small():
-                continue
-            new.append(box)
-        self.boxes = new
-
-    def find(self, x, y) -> Box | None:
-        for box in self.boxes:
-            if box.point_hit(x, y):
-                return box
-        return None
-
-    def all_box_ids(self) -> list[int]:
-        return [b.id for b in self.boxes]
-
-    @classmethod
-    def load(cls, page_data: dict, canvas_height: int):
-        page = cls(path=page_data["path"])
-        page.resize(canvas_height)
-        for box in page_data["boxes"]:
-            box = Box(
-                x0=box["x0"],
-                y0=box["y0"],
-                x1=box["x1"],
-                y1=box["y1"],
-                start=box["start"],
-            )
-            box.fit_to_canvas(page.height, canvas_height)
-            page.boxes.append(box)
-        return page
 
 
 class App(ctk.CTk):
-    row_span = 8
+    row_span: ClassVar[int] = 8
+    color_list: ClassVar[list[str]] = """
+        red blue green black purple orange cyan olive gray pink
+        """.split()
 
     def __init__(self):
         super().__init__()
@@ -210,7 +110,7 @@ class App(ctk.CTk):
 
     def display_page_boxes(self):
         self.clear_page_boxes()
-        self.colors = cycle(COLORS)
+        self.colors = cycle(self.color_list)
         for box in self.page.boxes:
             color = next(self.colors)
             dash = (30, 20) if box.start else ()
@@ -355,7 +255,7 @@ class App(ctk.CTk):
 
         self.curr_dir = image_dir
         self.image_dir = Path(image_dir)
-        self.colors = cycle(COLORS)
+        self.colors = cycle(self.color_list)
         self.dirty = False
 
         paths = [

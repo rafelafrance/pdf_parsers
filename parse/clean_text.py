@@ -7,8 +7,7 @@ from pathlib import Path
 import ftfy
 import regex as re
 import rich
-
-from parse.pylib import sentence_pipeline
+from pylib import sentence_pipeline
 from util.pylib import log
 
 MOJIBAKE = {

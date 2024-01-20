@@ -9,7 +9,6 @@ from PIL import Image
 from pylib import image_transformer as it
 from pylib.ocr import tesseract_engine
 from tqdm import tqdm
-
 from util.pylib import log
 
 

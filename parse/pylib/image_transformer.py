@@ -1,8 +1,6 @@
 """Image transforms performed on labels before OCR."""
-# type: ignore
 import functools
 import re
-from typing import Optional
 
 import numpy as np
 import pytesseract
@@ -15,6 +13,8 @@ from scipy.ndimage import interpolation as interp
 from skimage import filters
 from skimage import morphology as morph
 
+DIMS = 3
+
 
 def image_to_array(image):
     image = image.convert("L")
@@ -23,11 +23,11 @@ def image_to_array(image):
 
 def array_to_image(image: npt.NDArray) -> ImageType:
     if hasattr(image, "dtype") and image.dtype == "float64":
-        mode: Optional[str] = "L" if len(image.shape) < 3 else "RGB"
+        mode: str | None = "L" if len(image.shape) < DIMS else "RGB"
         return Image.fromarray(image * 255.0, mode)
     if hasattr(image, "dtype") and image.dtype == "bool":
         image = (image * 255).astype("uint8")
-        mode = "L" if len(image.shape) < 3 else "RGB"
+        mode = "L" if len(image.shape) < DIMS else "RGB"
         return Image.fromarray(image, mode)
     return Image.fromarray(image, "L")
 
@@ -74,7 +74,7 @@ def orient(
 
 def deskew(
     image: npt.NDArray,
-    horiz_angles: Optional[npt.NDArray] = None,
+    horiz_angles: npt.NDArray | None = None,
 ) -> npt.NDArray:
     """
     Find the skew of the label.
@@ -95,7 +95,7 @@ def deskew(
     best = max(scores)
     angle = horiz_angles[scores.index(best)]
 
-    if angle != 0.0:
+    if angle != 0.0:  # noqa: PLR2004
         image = ndimage.rotate(image, angle, mode="nearest")
 
     return image

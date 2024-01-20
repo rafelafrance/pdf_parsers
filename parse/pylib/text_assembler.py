@@ -77,7 +77,7 @@ def find_column_split(line, gap_min, gap_left, gap_right):
         x_min = max(prev.x_max, gap_left)
         x_max = min(curr.x_min, gap_right)
         inter = max(0.0, x_max - x_min)
-        if split >= gap_min and inter > 0.0:
+        if split >= gap_min and inter > 0.0:  # noqa: PLR2004
             splits.append((split, i))
     splits = sorted(splits, reverse=True)
     return splits[0][1] if splits else -1

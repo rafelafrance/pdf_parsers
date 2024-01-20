@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from typing import Union
 
 import customtkinter as ctk
 
@@ -10,7 +9,7 @@ class Spinner(ctk.CTkFrame):
         *args,
         width: int = 100,
         height: int = 32,
-        command: Callable = None,
+        command: Callable | None = None,
         start: int = 0,
         low: int = 0,
         high: int = 0,
@@ -83,7 +82,7 @@ class Spinner(ctk.CTkFrame):
         if self.command is not None:
             self.command()
 
-    def get(self) -> Union[int, None]:
+    def get(self) -> int | None:
         try:
             return int(self.entry.get())
         except ValueError:
