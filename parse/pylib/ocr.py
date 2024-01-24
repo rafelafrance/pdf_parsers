@@ -12,7 +12,11 @@ class EngineConfig:
     )
 
 
-def tesseract_engine(image) -> list[dict]:
+def image_to_string(image) -> str:
+    return pytesseract.image_to_string(image, config=EngineConfig.tess_config)
+
+
+def image_to_data(image) -> list[dict]:
     df = pytesseract.image_to_data(
         image,
         config=EngineConfig.tess_config,

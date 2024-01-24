@@ -209,7 +209,7 @@ class App(ctk.CTk):
         self.pages = []
         try:
             for page_data in json_pages:
-                page = Page.load(page_data, canvas_height)
+                page = Page.load_json(page_data, canvas_height)
                 self.pages.append(page)
 
             self.spinner_update(len(self.pages))
@@ -261,13 +261,14 @@ class App(ctk.CTk):
         paths = [
             p
             for p in sorted(self.image_dir.glob("*"))
-            if p.suffix.lower() in (".png", ".jpg", "jpeg", ".tiff")
+            if p.suffix.lower() in (".png", ".jpg", ".jpeg", ".tif", ".tiff")
         ]
 
         if paths:
             paths = sorted(p.name for p in paths)
             self.spinner_update(len(paths))
-            self.pages = [Page(path=self.image_dir / p) for p in paths]
+            canvas_height = self.image_frame.winfo_height()
+            self.pages = [Page(self.image_dir / p, canvas_height) for p in paths]
             self.save_button.configure(state="normal")
             self.display_page()
         else:

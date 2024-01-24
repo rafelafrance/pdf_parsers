@@ -1,28 +1,31 @@
-from dataclasses import dataclass, field
 from pathlib import Path
 
 from PIL import Image, ImageTk
 from pylib.slice_box import Box
 
 
-@dataclass
 class Page:
-    path: Path = None
-    width: int = None
-    height: int = None
-    photo: ImageTk = None
-    boxes: list[Box] = field(default_factory=list)
+    def __init__(self, path: Path, canvas_height: int) -> None:
+        self.path = path
+        self.canvas_height = canvas_height
+        self.photo = None
+        self.image_height = None
+        self.boxes = []
+        self.resize(canvas_height)
 
     def as_dict(self) -> dict:
         return {
             "path": str(self.path),
-            "boxes": [b.as_dict(self.height, self.photo.height()) for b in self.boxes],
+            "boxes": [
+                b.as_dict(self.image_height, self.canvas_height) for b in self.boxes
+            ],
         }
 
     def resize(self, canvas_height):
         if not self.photo:
             image = Image.open(self.path)
             image_width, image_height = image.size
+            self.image_height = image_height
             ratio = canvas_height / image_height
             new_width = int(image_width * ratio)
             new_height = int(image_height * ratio)
@@ -49,8 +52,8 @@ class Page:
         return [b.id for b in self.boxes]
 
     @classmethod
-    def load(cls, page_data: dict, canvas_height: int):
-        page = cls(path=page_data["path"])
+    def load_json(cls, page_data: dict, canvas_height: int):
+        page = cls(path=page_data["path"], canvas_height=canvas_height)
         page.resize(canvas_height)
         for box in page_data["boxes"]:
             box = Box(
@@ -60,6 +63,6 @@ class Page:
                 y1=box["y1"],
                 start=box["start"],
             )
-            box.fit_to_canvas(page.height, canvas_height)
+            box.fit_to_canvas(page.image_height, canvas_height)
             page.boxes.append(box)
         return page

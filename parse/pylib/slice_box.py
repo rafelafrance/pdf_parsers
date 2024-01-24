@@ -6,15 +6,15 @@ COORDS = tuple[int, int, int, int]
 
 @dataclass
 class Box:
-    id: int = None
-    x0: float = None
-    y0: float = None
-    x1: float = None
-    y1: float = None
-    start: bool = False
+    id: int = None  # Needed for tkinter
+    x0: int = None
+    y0: int = None
+    x1: int = None
+    y1: int = None
+    start: bool = False  # Is this the start of a treatment?
 
-    def as_dict(self, image_height: int, photo_height: int) -> dict:
-        x0, y0, x1, y1 = self.restore_coords(image_height, photo_height)
+    def as_dict(self, image_height: int, canvas_height: int) -> dict:
+        x0, y0, x1, y1 = self.restore_coords(image_height, canvas_height)
         return {"x0": x0, "y0": y0, "x1": x1, "y1": y1, "start": self.start}
 
     def too_small(self) -> bool:
@@ -25,8 +25,8 @@ class Box:
         y0, y1 = (self.y0, self.y1) if self.y1 > self.y0 else (self.y1, self.y0)
         return x0 <= x <= x1 and y0 <= y <= y1
 
-    def restore_coords(self, image_height: int, photo_height: int) -> COORDS:
-        ratio = image_height / photo_height
+    def restore_coords(self, image_height: int, canvas_height: int) -> COORDS:
+        ratio = image_height / canvas_height
         x0 = int(ratio * self.x0)
         y0 = int(ratio * self.y0)
         x1 = int(ratio * self.x1)

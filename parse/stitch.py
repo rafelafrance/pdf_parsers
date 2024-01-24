@@ -2,79 +2,66 @@
 import argparse
 import json
 import textwrap
-from dataclasses import dataclass
+from collections import defaultdict
 from pathlib import Path
 
-import pylib.text_assembler as ta
 from PIL import Image
-from pylib import image_transformer as it
-from pylib.ocr import tesseract_engine
+from pylib import image_transformer as trans
+from pylib.ocr import image_to_string
+from pylib.slice_box import Box
 from tqdm import tqdm
 from util.pylib import log
-
-
-@dataclass
-class Box:
-    x0: int = None
-    y0: int = None
-    x1: int = None
-    y1: int = None
-    start: bool = False
 
 
 def main():
     args = parse_args()
     log.started()
 
-    with args.in_json.open() as in_json:
-        page_data = json.load(in_json)
+    with args.in_json.open() as f:
+        json_data = json.load(f)
 
-    with args.out_text.open("w") as out_text:
-        for json_page in tqdm(page_data):
-            if not json_page["boxes"]:
-                continue
+    count = -1
+    path = path_name(count, args.text_out)
 
-            image = Image.open(json_page["path"])
-            if args.transform:
-                image = it.transform_label(args.transform, image)
+    treatment = defaultdict(list)
 
-            for box in json_page["boxes"]:
-                box = Box(**box)
+    # OCR text boxes from the slice.py script
+    for page in tqdm(json_data):
+        if not page["boxes"]:
+            continue
 
-                resize(json_page, image, box)  # ################################
-                cropped = image.crop((box.x0, box.y0, box.x1, box.y1))
+        image = Image.open(page["path"])
+        if args.transform:
+            image = trans.transform_label(args.transform, image)
 
-                page = ta.Page()
+        for box in page["boxes"]:
+            box = Box(**box)
 
-                words = [
-                    ta.Word(f["left"], f["top"], f["right"], f["bottom"], f["text"])
-                    for f in tesseract_engine(cropped)
-                    if f["conf"] >= args.conf
-                ]
-                page.words = sorted(words, key=lambda w: w.x_min)
-                page.lines = ta.find_lines(page)
+            cropped = image.crop((box.x0, box.y0, box.x1, box.y1))
+            text = image_to_string(cropped)
 
-                if box.start:
-                    print(args.pattern, file=out_text)
+            if box.start:
+                path = path_name(count, args.text_out)
 
-                for ln in page.lines:
-                    print(ln.text, file=out_text)
+            treatment[str(path)].append(text)
+
+    # Output text files
+    for path, text in treatment.items():
+        with Path(path).open("w") as f:
+            f.write("\n".join(text))
 
     log.finished()
 
 
-# #############################################
-def resize(page, image, box):
-    image_width, image_height = image.size
-    ratio = image_height / page["photo_y"]
-    box.x0 = int(ratio * box.x0)
-    box.y0 = int(ratio * box.y0)
-    box.x1 = int(ratio * box.x1)
-    box.y1 = int(ratio * box.y1)
+def path_name(count, text_out):
+    count += 1
+    stem = text_out.stem + f"_{str(count).zfill(3)}"
+    path = text_out.with_stem(stem)
+    return path
 
 
 def parse_args():
-    description = """Clean text to prepare it for trait extraction."""
+    description = """Build text to prepare it for trait extraction."""
     arg_parser = argparse.ArgumentParser(
         description=textwrap.dedent(description),
         fromfile_prefix_chars="@",
@@ -85,26 +72,21 @@ def parse_args():
         type=Path,
         required=True,
         metavar="PATH",
-        help="""JSON file that holds the output of the stitch.py script.""",
+        help="""JSON file that holds the output of the slice.py
+            (aka slice-gui) script.""",
     )
 
     arg_parser.add_argument(
-        "--out-text",
+        "--text-out",
         type=Path,
         required=True,
         metavar="PATH",
-        help="""Output the stitched text to this file.""",
+        help="""Use this as a template for naming output text files. One per file per
+            treatment. This script will add tie breakers to the file names to
+            differentiate them.""",
     )
 
-    arg_parser.add_argument(
-        "--pattern",
-        default="A taxon starts here.",
-        help="""This pattern demarcates where a treatment for a particular taxon starts
-            this may be a regular expression. You will often have to quote this
-            argument. (default: %(default)s)""",
-    )
-
-    transforms = list(it.TRANSFORM_PIPELINES.keys())
+    transforms = list(trans.TRANSFORM_PIPELINES.keys())
     arg_parser.add_argument(
         "--transform",
         choices=transforms,

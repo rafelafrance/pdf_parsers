@@ -7,7 +7,7 @@ import pylib.text_assembler as ta
 import rich
 from PIL import Image
 from pylib import image_transformer as it
-from pylib.ocr import tesseract_engine
+from pylib.ocr import image_to_data
 from tqdm import tqdm
 from util.pylib import log
 
@@ -63,7 +63,7 @@ def ocr_images(image_dir, min_y, max_y, conf, transform):
 
         words = [
             ta.Word(f["left"], f["top"], f["right"], f["bottom"], f["text"])
-            for f in tesseract_engine(image)
+            for f in image_to_data(image)
             if f["bottom"] >= min_y and f["top"] <= bottom and f["conf"] >= conf
         ]
         page.words = sorted(words, key=lambda w: w.x_min)
