@@ -13,7 +13,7 @@ from pylib.spin_box import Spinner
 
 
 class App(ctk.CTk):
-    row_span: ClassVar[int] = 8
+    row_span: ClassVar[int] = 10
     color_list: ClassVar[list[str]] = """
         red blue green black purple orange cyan olive gray pink
         """.split()
@@ -34,8 +34,8 @@ class App(ctk.CTk):
 
         self.title("Slice images for OCR")
 
-        self.grid_rowconfigure((0, 1, 2, 3, 4, 5, 6), weight=0)
-        self.grid_rowconfigure(7, weight=1)
+        self.grid_rowconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8), weight=0)
+        self.grid_rowconfigure(9, weight=1)
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=0)
 
@@ -77,6 +77,12 @@ class App(ctk.CTk):
             text="delete",
             value="delete",
         )
+        self.radio_clear = ctk.CTkRadioButton(
+            master=self,
+            variable=self.action,
+            text="clear area",
+            value="clear",
+        )
         self.radio_treatment = ctk.CTkRadioButton(
             master=self,
             variable=self.action,
@@ -85,7 +91,8 @@ class App(ctk.CTk):
         )
         self.radio_add.grid(row=4, column=1, padx=16, pady=16)
         self.radio_del.grid(row=5, column=1, padx=16, pady=16)
-        self.radio_treatment.grid(row=6, column=1, padx=16, pady=16)
+        self.radio_clear.grid(row=6, column=1, padx=16, pady=16)
+        self.radio_treatment.grid(row=7, column=1, padx=16, pady=16)
 
         self.protocol("WM_DELETE_WINDOW", self.safe_quit)
 
@@ -107,6 +114,7 @@ class App(ctk.CTk):
         self.canvas.delete("all")
         self.canvas.create_image((0, 0), image=self.page.photo, anchor="nw")
         self.display_page_boxes()
+        self.action.set("add")
 
     def display_page_boxes(self):
         self.clear_page_boxes()
@@ -114,19 +122,23 @@ class App(ctk.CTk):
         for box in self.page.boxes:
             color = next(self.colors)
             dash = (30, 20) if box.start else ()
+            fill = "#ccc" if box.clear else ""
+            stipple = "gray50" if box.clear else ""
             self.canvas.create_rectangle(
                 box.x0,
                 box.y0,
                 box.x1,
                 box.y1,
                 outline=color,
+                fill=fill,
                 width=4,
                 dash=dash,
+                stipple=stipple,
             )
 
     def clear_page_boxes(self):
         for i, id_ in enumerate(self.canvas.find_all()):
-            if i:  # First object should be the page itself
+            if i:  # First object is the page itself
                 self.canvas.delete(id_)
 
     def on_canvas_press(self, event):
@@ -141,12 +153,18 @@ class App(ctk.CTk):
             self.dragging = True
         elif self.pages and self.action.get() == "delete":
             self.dirty = True
-            self.page.filter(x, y)
+            self.page.filter_delete(x, y)
             self.display_page_boxes()
             self.action.set("add")
+        elif self.pages and self.action.get() == "clear":
+            self.dirty = True
+            box = self.page.find(x, y, "smallest")
+            if box:
+                box.clear = not box.clear
+                self.display_page_boxes()
         elif self.pages and self.action.get() == "start":
             self.dirty = True
-            box = self.page.find(x, y)
+            box = self.page.find(x, y, "largest")
             if box:
                 box.start = not box.start
                 self.display_page_boxes()
@@ -160,7 +178,7 @@ class App(ctk.CTk):
 
     def on_canvas_release(self, _):
         if self.dragging and self.pages and self.action.get() == "add":
-            self.page.filter()
+            self.page.filter_size()
             self.display_page_boxes()
             self.dragging = False
 

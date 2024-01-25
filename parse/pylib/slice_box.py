@@ -11,11 +11,22 @@ class Box:
     y0: int = None
     x1: int = None
     y1: int = None
-    start: bool = False  # Is this the start of a treatment?
+    start: bool = False  # Is this the start of a treatment
+    clear: bool = False  # Are we using this box to clear part of page w/ BG color
 
     def as_dict(self, image_height: int, canvas_height: int) -> dict:
         x0, y0, x1, y1 = self.restore_coords(image_height, canvas_height)
-        return {"x0": x0, "y0": y0, "x1": x1, "y1": y1, "start": self.start}
+        return {
+            "x0": x0,
+            "y0": y0,
+            "x1": x1,
+            "y1": y1,
+            "start": self.start,
+            "clear": self.clear,
+        }
+
+    def area(self) -> int:
+        return abs(self.x1 - self.x0) * abs(self.y1 - self.y0)
 
     def too_small(self) -> bool:
         return abs(self.x1 - self.x0) < TOO_SMALL or abs(self.y1 - self.y0) < TOO_SMALL

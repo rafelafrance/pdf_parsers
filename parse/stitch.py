@@ -5,12 +5,12 @@ import textwrap
 from collections import defaultdict
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageDraw
 from pylib import image_transformer as trans
 from pylib.ocr import image_to_string
 from pylib.slice_box import Box
 from tqdm import tqdm
-from util.pylib import log
+from util.pylib import log, util
 
 
 def main():
@@ -20,8 +20,7 @@ def main():
     with args.in_json.open() as f:
         json_data = json.load(f)
 
-    count = -1
-    path = path_name(count, args.text_out)
+    path, count = path_name(args.text_out, -1)
 
     treatment = defaultdict(list)
 
@@ -30,20 +29,32 @@ def main():
         if not page["boxes"]:
             continue
 
+        # Transform the image to help with OCR
         image = Image.open(page["path"])
         if args.transform:
             image = trans.transform_label(args.transform, image)
 
+        # Blot out areas marked as clear
+        draw = ImageDraw.Draw(image)
+
+        for box in page["boxes"]:
+            box = Box(**box)
+            if box.clear:
+                draw.rectangle((box.x0, box.y0, box.x1, box.y1), fill="white")
+
+        # Crop and OCR text areas
         for box in page["boxes"]:
             box = Box(**box)
 
-            cropped = image.crop((box.x0, box.y0, box.x1, box.y1))
-            text = image_to_string(cropped)
+            if not box.clear:
+                cropped = image.crop((box.x0, box.y0, box.x1, box.y1))
+                text = image_to_string(cropped)
 
-            if box.start:
-                path = path_name(count, args.text_out)
+                if box.start:
+                    path, count = path_name(args.text_out, count)
 
-            treatment[str(path)].append(text)
+                text = util.clean_text(text)
+                treatment[str(path)].append(text)
 
     # Output text files
     for path, text in treatment.items():
@@ -53,11 +64,11 @@ def main():
     log.finished()
 
 
-def path_name(count, text_out):
+def path_name(text_out: Path, count: int) -> tuple[Path, int]:
     count += 1
     stem = text_out.stem + f"_{str(count).zfill(3)}"
     path = text_out.with_stem(stem)
-    return path
+    return path, count
 
 
 def parse_args():

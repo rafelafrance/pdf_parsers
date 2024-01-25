@@ -1,7 +1,10 @@
 from pathlib import Path
+from typing import Literal
 
 from PIL import Image, ImageTk
 from pylib.slice_box import Box
+
+BoxSize = Literal["all", "largest", "smallest"]
 
 
 class Page:
@@ -32,24 +35,21 @@ class Page:
             resized = image.resize((new_width, new_height))
             self.photo = ImageTk.PhotoImage(resized)
 
-    def filter(self, x=None, y=None):
-        new = []
-        for box in self.boxes:
-            if x is not None and box.point_hit(x, y):
-                continue
-            if x is None and box.too_small():
-                continue
-            new.append(box)
-        self.boxes = new
+    def filter_delete(self, x, y):
+        hit = self.find(x, y, "smallest")
+        self.boxes = [b for b in self.boxes if b != hit]
 
-    def find(self, x, y) -> Box | None:
-        for box in self.boxes:
-            if box.point_hit(x, y):
-                return box
+    def filter_size(self):
+        self.boxes = [b for b in self.boxes if not b.too_small()]
+
+    def find(self, x: int, y: int, size: BoxSize = "all") -> Box | None:
+        hits = [b for b in self.boxes if b.point_hit(x, y)]
+
+        if hits:
+            hits = sorted(hits, key=lambda b: b.area())
+            return hits[-1] if size == "largest" else hits[0]
+
         return None
-
-    def all_box_ids(self) -> list[int]:
-        return [b.id for b in self.boxes]
 
     @classmethod
     def load_json(cls, page_data: dict, canvas_height: int):
@@ -62,6 +62,7 @@ class Page:
                 x1=box["x1"],
                 y1=box["y1"],
                 start=box["start"],
+                clear=box["clear"],
             )
             box.fit_to_canvas(page.image_height, canvas_height)
             page.boxes.append(box)
