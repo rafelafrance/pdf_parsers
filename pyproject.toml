@@ -33,14 +33,14 @@ optional-dependencies.dev = [
 ]
 
 [project.scripts]
-clean_text = "parse.clean_text:main"
-fix_page_nos = "parse.fix_page_nos:main"
-images_to_text = "parse.images_to_text:main"
-pdf_to_images = "parse.pdf_to_images:main"
-pdf_to_xhtml = "parse.pdf_to_xhtml:main"
-rename_pdfs = "parse.rename_pdfs:main"
+clean-text = "parse.clean_text:main"
+fix-page-nos = "parse.fix_page_nos:main"
+images-to-text = "parse.images_to_text:main"
+pdf-to-images = "parse.pdf_to_images:main"
+pdf-to-xhtml = "parse.pdf_to_xhtml:main"
+rename-pdfs = "parse.rename_pdfs:main"
 stitch = "parse.stitch:main"
-xhtml_to_text = "parse.xhtml_to_text:main"
+xhtml-to-text = "parse.xhtml_to_text:main"
 
 [project.gui-scripts]
 slice-gui = "parse.slice:main"
