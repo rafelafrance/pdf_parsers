@@ -1,10 +1,11 @@
-from spacy.lang.en import English
+import spacy
 from traiter.pylib.pipes import tokenizer
 from traiter.pylib.pipes.sentence import SENTENCES
 
 
 def pipeline():
-    nlp = English()
-    tokenizer.setup_tokenizer(nlp)
-    nlp.add_pipe(SENTENCES, config={"abbrev": tokenizer.ABBREVS})
+    nlp = spacy.load("en_core_web_sm", exclude=["ner", "lemmatizer", "tok2vec"])
+    tokenizer.append_abbrevs(nlp, tokenizer.ABBREVS)
+    tokenizer.append_abbrevs(nlp, tokenizer.PDF_ABBREVS)
+    nlp.add_pipe(SENTENCES, before="parser")
     return nlp
