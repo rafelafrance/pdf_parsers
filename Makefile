@@ -22,7 +22,7 @@ dev: venv
 	source $(VENV)/bin/activate
 	$(PIP_INSTALL) -U pip setuptools wheel
 	$(PIP_INSTALL) -e .[dev]
-	$(PIP_INSTALL) -e ../common_utils
+	$(PIP_INSTALL) -e ../../misc/common_utils
 	$(PIP_INSTALL) -e ../../traiter/traiter
 	$(SPACY_MODEL)
 	pre-commit install
