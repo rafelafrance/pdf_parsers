@@ -2,7 +2,8 @@ from pathlib import Path
 from typing import Literal
 
 from PIL import Image, ImageTk
-from pylib.slice_box import Box
+
+from parse.pylib.slice_box import Box
 
 BoxSize = Literal["all", "largest", "smallest"]
 

@@ -5,14 +5,15 @@ import textwrap
 from pathlib import Path
 
 import rich
-from pylib import sentence_pipeline
-from pylib.text_cleaner import (
+from util.pylib import log
+
+from parse.pylib import sentence_pipeline
+from parse.pylib.text_cleaner import (
     MOJIBAKE,
     build_replace_patterns,
     clean_text,
     make_sentences,
 )
-from util.pylib import log
 
 
 def main():

@@ -7,9 +7,10 @@ from tkinter import filedialog, messagebox
 from typing import ClassVar
 
 import customtkinter as ctk
-from pylib.slice_box import Box
-from pylib.slice_page import Page
-from pylib.spin_box import Spinner
+
+from parse.pylib.slice_box import Box
+from parse.pylib.slice_page import Page
+from parse.pylib.spin_box import Spinner
 
 
 class App(ctk.CTk):

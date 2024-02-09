@@ -5,8 +5,9 @@ from pathlib import Path
 
 import rich
 from bs4 import BeautifulSoup
-from pylib.text_assembler import Page, Word, find_lines, page_flow
 from util.pylib import log
+
+from parse.pylib.text_assembler import Page, Word, find_lines, page_flow
 
 
 def main():

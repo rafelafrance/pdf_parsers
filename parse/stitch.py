@@ -6,11 +6,12 @@ from collections import defaultdict
 from pathlib import Path
 
 from PIL import Image, ImageDraw
-from pylib import image_transformer as trans
-from pylib.ocr import image_to_string
-from pylib.slice_box import Box
 from tqdm import tqdm
 from util.pylib import log, util
+
+from parse.pylib import image_transformer as trans
+from parse.pylib.ocr import image_to_string
+from parse.pylib.slice_box import Box
 
 
 def main():

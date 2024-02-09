@@ -48,6 +48,11 @@ slice-gui = "parse.slice:main"
 [tool.setuptools]
 py-modules = []
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["parse"]
+namespaces = false
+
 [tool.ruff]
 target-version = "py311"
 

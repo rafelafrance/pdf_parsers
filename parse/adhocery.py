@@ -5,9 +5,10 @@ from collections import defaultdict
 from pathlib import Path
 
 import regex as re
-from pylib import sentence_pipeline
-from pylib.text_cleaner import make_sentences
 from tqdm import tqdm
+
+from parse.pylib import sentence_pipeline
+from parse.pylib.text_cleaner import make_sentences
 
 CHOICES = ["shift-left", "taxon-lines", "split-treatments"]
 

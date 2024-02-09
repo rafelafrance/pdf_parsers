@@ -6,10 +6,11 @@ from pathlib import Path
 import pylib.text_assembler as ta
 import rich
 from PIL import Image
-from pylib import image_transformer as it
-from pylib.ocr import image_to_data
 from tqdm import tqdm
 from util.pylib import log
+
+from parse.pylib import image_transformer as it
+from parse.pylib.ocr import image_to_data
 
 
 def main():
