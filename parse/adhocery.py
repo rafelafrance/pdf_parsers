@@ -6,6 +6,7 @@ from pathlib import Path
 
 import regex as re
 from tqdm import tqdm
+from util.pylib import util
 
 from parse.pylib import sentence_pipeline
 from parse.pylib.text_cleaner import make_sentences
@@ -59,6 +60,8 @@ def clean(nlp, lines: list[str]) -> str:
     text = " ".join(text.split())
     lines = make_sentences(nlp, text)
     text = "".join(lines)
+
+    text = util.clean_text(text)
 
     # Fix odd splits
     text = re.sub(r"([a-z])(-|–)\s([a-z])", r"\1\2", text, flags=re.IGNORECASE)
@@ -160,6 +163,13 @@ def parse_args():
         metavar="PATH",
         help="""Input text is in this file. It should be preprocessed and have
             separators between the treatments.""",
+    )
+
+    arg_parser.add_argument(
+        "--out-text",
+        type=Path,
+        metavar="PATH",
+        help="""Output text to this file.""",
     )
 
     arg_parser.add_argument(

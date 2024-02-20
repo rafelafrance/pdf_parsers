@@ -5,15 +5,10 @@ import textwrap
 from pathlib import Path
 
 import rich
-from util.pylib import log
+from util.pylib import log, util
 
 from parse.pylib import sentence_pipeline
-from parse.pylib.text_cleaner import (
-    MOJIBAKE,
-    build_replace_patterns,
-    clean_text,
-    make_sentences,
-)
+from parse.pylib.text_cleaner import MOJIBAKE, MOJIBAKE_WORDS, make_sentences
 
 
 def main():
@@ -35,8 +30,7 @@ def clean(args):
     # The bulk of the text cleaning happens in this function
     logging.info("Cleaning text")
     trans = str.maketrans(MOJIBAKE)
-    regexp = build_replace_patterns()
-    text = clean_text(text, trans=trans, regexp=regexp)
+    text = util.clean_text(text, trans=trans, replace=MOJIBAKE_WORDS)
 
     # Break into sentences
     logging.info("Breaking text into sentences")
