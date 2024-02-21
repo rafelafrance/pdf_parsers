@@ -15,7 +15,7 @@ def main():
 
     args = parse_args()
 
-    dirty = list(args.text_dir.glob("*.txt"))
+    dirty = list(args.dirty_dir.glob("*.txt"))
 
     trans = str.maketrans(MOJIBAKE)
 
@@ -47,7 +47,7 @@ def parse_args():
     )
 
     arg_parser.add_argument(
-        "--text-dir",
+        "--dirty-dir",
         type=Path,
         required=True,
         metavar="PATH",

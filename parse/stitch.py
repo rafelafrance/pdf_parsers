@@ -21,7 +21,7 @@ def main():
     with args.in_json.open() as f:
         json_data = json.load(f)
 
-    path, count = path_name(args.text_out, -1)
+    path, count = path_name(args.treatment_pattern, -1)
 
     treatment = defaultdict(list)
 
@@ -52,7 +52,7 @@ def main():
                 text = image_to_string(cropped)
 
                 if box.start:
-                    path, count = path_name(args.text_out, count)
+                    path, count = path_name(args.treatment_pattern, count)
 
                 text = util.clean_text(text)
                 treatment[str(path)].append(text)
@@ -65,10 +65,10 @@ def main():
     log.finished()
 
 
-def path_name(text_out: Path, count: int) -> tuple[Path, int]:
+def path_name(treatment_pattern: Path, count: int) -> tuple[Path, int]:
     count += 1
-    stem = text_out.stem + f"_{str(count).zfill(3)}"
-    path = text_out.with_stem(stem)
+    stem = treatment_pattern.stem + f"_{str(count).zfill(4)}"
+    path = treatment_pattern.with_stem(stem)
     return path, count
 
 
@@ -89,7 +89,7 @@ def parse_args():
     )
 
     arg_parser.add_argument(
-        "--text-out",
+        "--treatment-template",
         type=Path,
         required=True,
         metavar="PATH",

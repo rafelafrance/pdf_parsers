@@ -5,7 +5,7 @@ Utilities for parsing PDFs for information extraction.
 1. [Description](#Description)
 2. [Install](#Install)
 3. [Utilities](#Utilities)
-4. [Scenario: Clean PDFs with properly formatted text](#Clean-PDFs)
+4. [Scenario: Clean PDFs with properly formatted text](#PDFs-are-clean)
 5. [Scenario: OCR PDF images](#OCR-PDF-images)
 
 ## Description
@@ -20,7 +20,9 @@ _**Note: that these scripts are far from perfect, just sometimes useful for our 
 
 Install the poppler utilities. On Ubuntu Linux this looks like: `sudo apt install poppler-utils`.
 
-You can install the other requirements into your python virtual environment like so:
+If you need to OCR PDFs you need to install tesseract (Ubuntu) like: `sudo apt install tesseract-ocr`.
+
+You can install script requirements into your python virtual environment like so:
 
 ```bash
 git clone https://github.com/rafelafrance/pdf_parsers.git
@@ -106,41 +108,68 @@ Other arguments:
 
 ## OCR PDF images
 
+This sequence of scripts coverts a PDF to images and the OCRs the images to get text.
+
 ### Convert PDFs to images
+
+First we need to convert the PDF into images so that we can run an OCR program on it. This script output one image file per page.
 
 Example:
 
 ```bash
-pdf-to-images ...
+pdf-to-images --in-pdf /path/to/treatments.pdf --image-dir /path/to/treatment/images
+```
+
+### Fix image page numbers
+
+Sometimes the `pdf-to-images` output has names that do not sort in order, which will mess up the `slice-gui` script (below). This utility may fix this. I rarely need this utility, but when you need it, you will be glad you have it.
+
+Example:
+
+```bash
+fix-page-nos --image-dir /path/to/treatment/images --glob '*.jpg'
 ```
 
 ### Slice images into text areas
 
 This script allows you to manually outline text on images from `pdf-to-images` with bounding boxes that contain treatment text. The boxes on a page must be in reading order. You need to mark which boxes are at the start of a treatment.
 
+The output is a JSON file that holds the images paths and notes about the boxes drawn on them.
+
 Example:
 
 ```bash
-slice-gui ...
+slice-gui
 ```
+
+[<img src="assets/slice_example.png" width="800" />](assets/slice_example.png)
+
+In this example the areas start at the top left and end at the bottom right, going down the columns. In order:
+
+1. The top left box (red) holds the final text from a previous treatment.
+2. The bottom left box (blue) holds the start of the next treatment. The treatment start is indicated by a dashed box.
+3. The top right box (green) holds the second portion of the treatment started in #2.
+4. The bottom right box (black) holds the start of another treatment. Another dashed box.
+
+- Notice that the header and key in the middle of the right column are skipped.
+- You are able to mark boxes as "clear area" which I use to remove diagrams that are embedded in the text and would be cumbersome to draw boxes around.
 
 ### OCR text from slices
 
-This script takes the boxes from `slice.py` OCRs them and puts the text into separate files per treatment.
+This script takes the boxes from `slice-gui` OCRs them and puts the text into separate files, one per treatment.
 
 Example:
 
 ```bash
-stitch ...
+stitch --in-json /path/to/slice.json --treatment-template /template/for/treatment.txt
 ```
 
 ### Clean OCR text
 
-Now we take the text from the previous step and format it so that we can parse the text with spaCy rule-based parsers. This breaks the text into sentences, joins hyphenated words, fixes mojibake, removes control characters, space normalizes text, etc. Examine the output of this text to make sure things are still working as expected.
-   1. The step for breaking the text into sentences is very slow.
+Now we take the text from the previous step and format it so that we can parse the text with spaCy rule-based parsers. This joins hyphenated words, fixes mojibake, removes control characters, space normalizes text, etc. Examine the output of this text to make sure things worked as expected.
 
 Example:
 
 ```bash
-clean-text ...
+clean-text --dirty-dir /path/to/treatments --clean-dir /path/to/clean/treatments
 ```

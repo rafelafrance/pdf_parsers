@@ -5,36 +5,38 @@ import textwrap
 from pathlib import Path
 
 import rich
+from util.pylib import log
 
 
 def main():
+    log.started()
     args = parse_args()
 
-    paths = sorted(args.dir.glob(args.glob))
+    paths = sorted(args.image_dir.glob(args.glob))
     for src in paths:
         parts = src.stem.split("_")
         if len(parts) != 2:  # noqa: PLR2004
             continue
         try:
             _ = int(parts[1])
-            stem = f"{parts[0]}_{parts[1].zfill(3)}"
+            stem = f"{parts[0]}_{parts[1].zfill(4)}"
             dst = src.with_stem(stem)
             shutil.move(src, dst)
         except ValueError:
             rich.print(f"Could not rename: [bold red]{src}[/bold red]")
             continue
 
+    log.finished()
+
 
 def parse_args():
-    """Process command-line arguments."""
-    description = """Fix image numbers."""
     arg_parser = argparse.ArgumentParser(
-        description=textwrap.dedent(description),
         fromfile_prefix_chars="@",
+        description=textwrap.dedent("""Fix image page numbers."""),
     )
 
     arg_parser.add_argument(
-        "--dir",
+        "--image-dir",
         type=Path,
         required=True,
         metavar="DIR",
