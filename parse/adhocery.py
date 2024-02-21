@@ -8,9 +8,6 @@ import regex as re
 from tqdm import tqdm
 from util.pylib import util
 
-from parse.pylib import sentence_pipeline
-from parse.pylib.text_cleaner import make_sentences
-
 CHOICES = ["shift-left", "taxon-lines", "split-treatments"]
 
 
@@ -31,8 +28,6 @@ def main():
 def split_treatments(in_text: Path, out_dir: Path, pattern: str) -> None:
     sep_re = re.compile(rf"{pattern}")
 
-    nlp = sentence_pipeline.pipeline()
-
     treatments = defaultdict(list)
     path = None
     i = 0
@@ -50,24 +45,19 @@ def split_treatments(in_text: Path, out_dir: Path, pattern: str) -> None:
 
     for path, lines in tqdm(treatments.items()):
         path = Path(path)
-        text = clean(nlp, lines)
+        text = clean(lines)
         with path.open("w") as out:
             out.writelines(text)
 
 
-def clean(nlp, lines: list[str]) -> str:
+def clean(lines: list[str]) -> str:
     text = " ".join(lines)
-    text = " ".join(text.split())
-    lines = make_sentences(nlp, text)
-    text = "".join(lines)
-
     text = util.clean_text(text)
 
     # Fix odd splits
-    text = re.sub(r"([a-z])(-|–)\s([a-z])", r"\1\2", text, flags=re.IGNORECASE)
-    text = re.sub(r"\n([,;:])", r"\1", text, flags=re.IGNORECASE)
-    text = re.sub(r"([,;:=])\n", r"\1 ", text, flags=re.IGNORECASE)
-    text = re.sub(r"([a-z])\n([a-z])", r"\1 \2", text, flags=re.IGNORECASE)
+    text = re.sub(r"([a-z])(-|–)\s([a-z])", r"\1\2\3", text, flags=re.IGNORECASE)
+    text = re.sub(r"([a-z])\s(-|–)([a-z])", r"\1\2\3", text, flags=re.IGNORECASE)
+    text = re.sub(r"\s([,;:.])", r"\1", text, flags=re.IGNORECASE)
 
     return text
 
