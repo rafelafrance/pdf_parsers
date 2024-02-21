@@ -53,7 +53,7 @@ TODO formalize these scripts.
 python parse/adhocery.py ...
 ```
 
-## Clean PDFs
+## PDFs are clean
 
 The first thing you want to try is to extract text from the PDF directly. If the text is actually there then you want to use this text because everything else is typically much worse.
 
@@ -71,7 +71,7 @@ Then you can use the wrapper around the poppler tools to extract text.
 Example:
 
 ```bash
-pdftotext -layout -x 0 -y 50 -W 1275 -H 1600 data/pdfs/treatments.pdf data/text/treatments.txt
+pdftotext -layout -x 0 -y 50 -W 1275 -H 1600 /path/to/pdfs/treatments.pdf /path/to/text/treatments.txt
 ```
 
 You will need to change the arguments for your situation. `pdftotext -h`.
@@ -87,7 +87,7 @@ Convert a PDF into an XHTML document that contains the bounding box of every wor
 Example:
 
 ```bash
-pdf-to-xhtml --in-pdf data/treatment.pdf --out-xhtml data/treatments.xhtml
+pdf-to-xhtml --in-pdf /path/to/treatments.pdf --out-xhtml /path/to/treatments.xhtml
 ```
 
 #### XHTML to text
@@ -95,7 +95,7 @@ pdf-to-xhtml --in-pdf data/treatment.pdf --out-xhtml data/treatments.xhtml
 Try to assemble the text into the proper order. Getting the arguments right is a trick, but it has worked for me in some cases.
 
 ```bash
-xhtml-to-text --in-xhtml data/treatments.xhtml --out-text data/treatments.txt
+xhtml-to-text --in-xhtml /path/to/treatments.xhtml --out-text /path/to/treatments.txt
 ```
 
 Other arguments:
