@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
 import argparse
-import logging
 import textwrap
 from pathlib import Path
 
 import rich
+from tqdm import tqdm
 from util.pylib import log, util
 
-from parse.pylib import sentence_pipeline
-from parse.pylib.text_cleaner import MOJIBAKE, MOJIBAKE_WORDS, make_sentences
+from parse.pylib.text_cleaner import MOJIBAKE, MOJIBAKE_WORDS
 
 
 def main():
-    args = parse_args()
     log.started()
 
-    clean(args)
+    args = parse_args()
+
+    dirty = list(args.text_dir.glob("*.txt"))
+
+    trans = str.maketrans(MOJIBAKE)
+
+    for in_path in tqdm(dirty):
+        clean(in_path, args.clean_dir, trans)
 
     msg = "You may want to look over and edit the output text."
     rich.print(f"\n[bold yellow]{msg}[/bold yellow]\n")
@@ -23,23 +28,15 @@ def main():
     log.finished()
 
 
-def clean(args):
-    with args.in_text.open() as raw_file:
+def clean(in_path: Path, clean_dir: Path, trans):
+    with in_path.open() as raw_file:
         text = raw_file.read()
 
-    # The bulk of the text cleaning happens in this function
-    logging.info("Cleaning text")
-    trans = str.maketrans(MOJIBAKE)
     text = util.clean_text(text, trans=trans, replace=MOJIBAKE_WORDS)
 
-    # Break into sentences
-    logging.info("Breaking text into sentences")
-    nlp = sentence_pipeline.pipeline()
-    nlp.max_length = args.nlp_max_length
-    lines = make_sentences(text, args.nlp_max_length)
-
-    with args.out_text.open("w") as clean_file:
-        clean_file.writelines(lines)
+    out_path = clean_dir / in_path.name
+    with out_path.open("w") as clean_file:
+        clean_file.write(text)
 
 
 def parse_args():
@@ -50,32 +47,22 @@ def parse_args():
     )
 
     arg_parser.add_argument(
-        "--in-text",
+        "--text-dir",
         type=Path,
         required=True,
         metavar="PATH",
-        help="""Which text file to clean.""",
+        help="""Get input text files from this directory.""",
     )
 
     arg_parser.add_argument(
-        "--out-text",
+        "--clean-dir",
         type=Path,
         required=True,
         metavar="PATH",
-        help="""Output the cleaned text to this file.""",
-    )
-
-    arg_parser.add_argument(
-        "--nlp-max-length",
-        type=int,
-        default=5,
-        metavar="MB",
-        help="""The maximum text file size to process. This is given in megabytes.
-            This is a spaCy constraint. (default: %(default)s)""",
+        help="""Output the cleaned text files to this directory.""",
     )
 
     args = arg_parser.parse_args()
-    args.nlp_max_length *= 1_000_000
     return args
 
 
