@@ -5,8 +5,8 @@ Utilities for parsing PDFs for information extraction.
 1. [Description](#Description)
 2. [Install](#Install)
 3. [Utilities](#Utilities)
-4. [Scenario: Clean PDFs with properly formatted text](#PDFs-are-clean)
-5. [Scenario: OCR PDF images](#OCR-PDF-images)
+4. [Scenario: PDF has text](#PDF-has-text)
+5. [Scenario: OCR PDF](#OCR-PDF)
 
 ## Description
 
@@ -55,7 +55,7 @@ TODO formalize these scripts.
 python parse/adhocery.py ...
 ```
 
-## PDFs are clean
+## PDF has text
 
 The first thing you want to try is to extract text from the PDF directly. If the text is actually there then you want to use this text because everything else is typically much worse.
 
@@ -106,7 +106,7 @@ Other arguments:
 - `--min-y`: Remove words that are above this distance (in pixels) from the top of the page.
 - `--max-y`: Remove words that are below this distance (in pixels) from the bottom of the page.
 
-## OCR PDF images
+## OCR PDF
 
 This sequence of scripts coverts a PDF to images and the OCRs the images to get text.
 
