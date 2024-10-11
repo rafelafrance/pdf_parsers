@@ -128,7 +128,7 @@ def parse_args():
           "135i. Astragalus Linnaeus sect. Tiopsidei Barneby, Mem. New ...".
 
         - taxon-lines: I have a text file with each treatment separated by a line of
-          equal signs (====...). Note that the treatments were separated manually while
+          with a known pattern. Note that the treatments were separated manually while
           also removing excess non-treatments data. There are two issues I want to check
           before separating the treatments into separate files:
           1. Did I actually get all of the treatments?
@@ -136,7 +136,7 @@ def parse_args():
              cause issues with line ordering.
 
         - split-treatments: After separating all treatments in a PDF with lines of
-          equal signs (====...), write each treatment into a separate file.
+          with a known pattern, write each treatment into a separate file.
         """
         ),
     )

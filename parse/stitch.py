@@ -89,11 +89,11 @@ def parse_args():
     )
 
     arg_parser.add_argument(
-        "--treatment-template",
+        "--treatment-pattern",
         type=Path,
         required=True,
         metavar="PATH",
-        help="""Use this as a template for naming output text files. One per file per
+        help="""Use this as a pattern for naming output text files. One per file per
             treatment. This script will add tie breakers to the file names to
             differentiate them.""",
     )
