@@ -1,4 +1,4 @@
-#!/usr/bin/env python3old
+#!/usr/bin/env python3
 import argparse
 import os
 import textwrap
@@ -31,7 +31,7 @@ def pdf_to_images(args):
 
 def parse_args():
     arg_parser = argparse.ArgumentParser(
-        fromfile_prefix_chars="@",
+        allow_abbrev=True,
         description=textwrap.dedent(
             """
             Convert a PDF file to images (jpg) of pages (one image per page).
