@@ -5,9 +5,8 @@ from pathlib import Path
 
 import rich
 from bs4 import BeautifulSoup
+from pylib.text_assembler import Page, Word, find_lines, page_flow
 from util.pylib import log
-
-from parse.pylib.text_assembler import Page, Word, find_lines, page_flow
 
 
 def main():
@@ -43,8 +42,8 @@ def xhtml_to_text(args):
 def read_xhtml(in_html, min_y, max_y):
     pages = []
 
-    with in_html.open() as in_html:
-        doc = in_html.read()
+    with in_html.open() as in_file:
+        doc = in_file.read()
 
     soup = BeautifulSoup(doc, features="lxml")
 
