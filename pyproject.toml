@@ -1,139 +1,68 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
-build-backend = "setuptools.build_meta"
+requires = ["uv_build>=0.8.13"]
+build-backend = "uv_build"
 
 [project]
 name = "pdf_parsers"
-version = "0.1.0"
+version = "0.2.0"
 readme = "README.md"
 description = "Parse PDFs for information extraction"
-license = {file = "LICENSE"}
-authors = [{name="Raphael LaFrance", email="raphael.lafrance@gmail.com"}]
-requires-python = ">=3.11"
+license = { file = "LICENSE" }
+authors = [{ name = "Raphael LaFrance", email = "raphael.lafrance@gmail.com" }]
+requires-python = ">=3.13"
 dependencies = [
-    "Jinja2",
-    "beautifulsoup4",
-    "customtkinter",
-    "lxml",
-    "numpy",
-    "pillow",
-    "pytesseract",
-    "regex",
-    "rich",
-    "scikit-image",
-    "scipy",
-]
-optional-dependencies.dev = [
-    "build",
-    "pre-commit",
-    "pre-commit-hooks",
-    "ruff",
-    "ruff-lsp",
+    "lmstudio>=1.5.0",
+    "pillow>=12.0.0",
+    # "Jinja2",
+    # "pillow",
+    # "regex",
+    # "rich",
+    "rich>=14.2.0",
+    "tqdm>=4.67.1",
 ]
 
-[project.scripts]
-clean-text = "parse.clean_text:main"
-fix-page-nos = "parse.fix_page_nos:main"
-images-to-text = "parse.images_to_text:main"
-pdf-to-images = "parse.pdf_to_images:main"
-pdf-to-xhtml = "parse.pdf_to_xhtml:main"
-rename-pdfs = "parse.rename_pdfs:main"
-stitch = "parse.stitch:main"
-xhtml-to-text = "parse.xhtml_to_text:main"
+[dependency-groups]
+dev = ["pre-commit>=4.3.0", "uv-build>=0.8.13"]
 
-[project.gui-scripts]
-slice-gui = "parse.slice:main"
+[tool.uv.build-backend]
+module-root = "."
+module-name = "parse"
 
-[tool.setuptools]
-py-modules = []
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["parse"]
-namespaces = false
+[tool.uv]
 
 [tool.ruff]
-target-version = "py311"
 
 show-fixes = true
 
-lint.select = [
-    "F",
-    "E",
-    "W",
-    "C90",
-    "I",
-    "N",
-    "D",
-    "UP",
-    "S",
-    "BLE",
-    "FBT",
-    "B",
-#    "A",
-    "COM",
-    "C4",
-    "T10",
-    "EM",
-    "EXE",
-    "FA",
-    "ISC",
-    "ICN",
-    "G",
-    "INP",
-    "PIE",
-    "T20",
-    "PYI",
-    "PT",
-    "Q",
-    "RSE",
-    "RET",
-    "SLF",
-    "SLOT",
-    "SIM",
-    "TID",
-    "TCH",
-    "INT",
-#    "ARG",
-    "PTH",
-    "TD",
-    "FIX",
-    "PD",
-    "PGH",
-    "PL",
-    "TRY",
-    "FLY",
-    "NPY",
-    "PERF",
-#    "FURB",
-#    "LOG",
-    "RUF",
-]
+[tool.ruff.lint]
 
-lint.ignore = [
-    "A003",  # Class attribute is shadowing a Python builtin
+select = ["ALL"]
+
+ignore = [
+    "C901",    # is too complex
     "COM812",  # Trailing comma missing
-    "D100",  # Missing docstring in public module
-    "D101",  # Missing docstring in public class
-    "D102",  # Missing docstring in public method
-    "D103",  # Missing docstring in public function
-    "D104",  # Missing docstring in public package
-    "D105",  # Missing docstring in public method
-    "D107",  # Missing docstring in public __init__
-    "D203",  # 1 blank line required before class docstring
-    "D212",  # Multi-line docstring summary should start at the first line
-    "ISC001",  # Implicitly concatenated string literals on one line
-    "N818",  # Exception name {name} should be named with an Error suffix
-    "PD901",  # Avoid using the generic variable name df for DataFrames
-    "PLR0913",  # Too many arguments in function definition ({c_args} > {max_args})
-    "PLW2901",  # Outer {outer_kind} variable {name} overwritten by inner {inner_kind} target
-    "PLW0603",  # Using the global statement to update {name} is discouraged
-    "PT009",  # Use a regular assert instead of unittest-style {assertion}
+    "D100",    # Missing docstring in public module
+    "D101",    # Missing docstring in public class
+    "D102",    # Missing docstring in public method
+    "D103",    # Missing docstring in public function
+    "D104",    # Missing docstring in public package
+    "D105",    # Missing docstring in public method
+    "D107",    # Missing docstring in public __init__
+    "D203",    # 1 blank line required before class docstring
+    "D212",    # Multi-line docstring summary should start at the first line
+    "DTZ005",  # Pass a `datetime.timezone` object to the `tz` parameter
+    "ERA001",  # Remove commented-out code
+    "FIX002",  # Line contains TODO, consider resolving the issue
+    "LOG015",  # Use own logger instead TODO
+    "PLW2901", # Outer {outer_kind} variable {name} overwritten by inner {inner_kind} target
+    "PT009",   # Use a regular "assert" instead of unittest-style {assertion}
     "RET504",  # Unnecessary assignment to {name} before return statement
     "RUF001",  # String contains ambiguous {}. Did you mean {}?
+    "RUF003",  # Comment contains ambiguous character
     "SIM114",  # Combine if branches using logical or operator
     "SIM117",  # Use a single with statement with multiple contexts instead of nested with statements
     "SLF001",  # Private member accessed: {access}
-    "T201",  # print found
-    "TID252",  # Prefer absolute imports over relative imports from parent modules
+    "T201",    # print found
+    "TD002",   # Missing author in TODO
+    "TD003",   # Missing issue link for this TODO
 ]

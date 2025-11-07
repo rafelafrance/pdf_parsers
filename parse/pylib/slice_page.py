@@ -13,7 +13,7 @@ class Page:
         self.path = path
         self.canvas_height = canvas_height
         self.photo = None
-        self.image_height = None
+        self.image_height = -1
         self.boxes = []
         self.resize(canvas_height)
 
@@ -25,7 +25,7 @@ class Page:
             ],
         }
 
-    def resize(self, canvas_height):
+    def resize(self, canvas_height: int) -> None:
         if not self.photo:
             image = Image.open(self.path)
             image_width, image_height = image.size
@@ -36,11 +36,11 @@ class Page:
             resized = image.resize((new_width, new_height))
             self.photo = ImageTk.PhotoImage(resized)
 
-    def filter_delete(self, x, y):
+    def filter_delete(self, x: int, y: int) -> None:
         hit = self.find(x, y, "smallest")
         self.boxes = [b for b in self.boxes if b != hit]
 
-    def filter_size(self):
+    def filter_size(self) -> None:
         self.boxes = [b for b in self.boxes if not b.too_small()]
 
     def find(self, x: int, y: int, size: BoxSize = "all") -> Box | None:
@@ -53,7 +53,7 @@ class Page:
         return None
 
     @classmethod
-    def load_json(cls, page_data: dict, canvas_height: int):
+    def load_json(cls, page_data: dict, canvas_height: int) -> "Page":
         page = cls(path=page_data["path"], canvas_height=canvas_height)
         page.resize(canvas_height)
         for box in page_data["boxes"]:

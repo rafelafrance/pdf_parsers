@@ -1,18 +1,12 @@
 #!/usr/bin/env python3
 import argparse
+import re
 import shutil
 import textwrap
 from pathlib import Path
 
-import regex as re
 
-
-def main():
-    args = parse_args()
-    rename_pdfs(args)
-
-
-def rename_pdfs(args):
+def main(args: argparse.Namespace) -> None:
     for old_path in args.pdf_dir.glob("*.pdf"):
         print(f"Old name: {old_path}")
 
@@ -32,14 +26,17 @@ def rename_pdfs(args):
         print()
 
 
-def parse_args():
-    description = """It's easier, not required but much easier, to work with sane
-        file names. Remove characters that cause command line utilities problems.
-        Remove spaces, commas, parentheses, etc. and replace them with underscores _.
-        """
+def parse_args() -> argparse.Namespace:
     arg_parser = argparse.ArgumentParser(
-        description=textwrap.dedent(description),
-        fromfile_prefix_chars="@",
+        allow_abbrev=True,
+        description=textwrap.dedent(
+            """
+            It's easier, not required but much easier, to work with sane
+            file names. Remove characters that cause command line utilities problems.
+            Remove spaces, commas, parentheses, etc. and replace them with
+            underscores _.
+            """
+        ),
     )
 
     arg_parser.add_argument(
@@ -55,4 +52,5 @@ def parse_args():
 
 
 if __name__ == "__main__":
-    main()
+    ARGS = parse_args()
+    main(ARGS)

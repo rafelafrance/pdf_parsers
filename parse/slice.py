@@ -3,35 +3,44 @@ import json
 import tkinter as tk
 from itertools import cycle
 from pathlib import Path
-from tkinter import filedialog, messagebox
-from typing import ClassVar
-
-import customtkinter as ctk
+from tkinter import Event, filedialog, messagebox, ttk
+from typing import ClassVar, LiteralString
 
 from parse.pylib.slice_box import Box
 from parse.pylib.slice_page import Page
-from parse.pylib.spin_box import Spinner
+
+FONT = ("DejaVu Sans", 24)
+FONT_SM = ("DejaVu Sans", 16)
+FONT_SM_I = ("DejaVu Sans", 16, "italic")
+FONT_SM_U = ("DejaVu Sans", 16, "underline")
+FONT_SM_UI = ("DejaVu Sans", 16, "underline italic")
 
 
-class App(ctk.CTk):
+class App(tk.Tk):
     row_span: ClassVar[int] = 10
-    color_list: ClassVar[list[str]] = """
-        red blue green black purple orange cyan olive gray pink
-        """.split()
+    color_list: ClassVar[list[LiteralString]] = [
+        "red",
+        "blue",
+        "green",
+        "black",
+        "purple",
+        "orange",
+        "cyan",
+        "olive",
+        "gray",
+        "pink",
+    ]
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         self.curr_dir = "."
-        self.image_dir = None
-        self.canvas = None
+        self.image_dir: Path = Path()
+        self.canvas: tk.Canvas = tk.Canvas()
         self.pages = []
-        self.colors = None
+        self.colors = cycle(self.color_list)
         self.dirty = False
         self.dragging = False
-
-        ctk.set_appearance_mode("System")
-        ctk.set_default_color_theme("blue")
 
         self.title("Slice images for OCR")
 
@@ -40,55 +49,46 @@ class App(ctk.CTk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=0)
 
-        self.image_frame = ctk.CTkFrame(master=self)
+        self.image_frame = ttk.Frame(master=self)
         self.image_frame.grid(row=0, column=0, rowspan=self.row_span, sticky="nsew")
 
-        self.image_button = ctk.CTkButton(
-            master=self,
-            text="Choose image directory",
-            command=self.get_image_dir,
+        self.image_button = tk.Button(
+            master=self, text="Choose image directory", command=self.get_image_dir
         )
         self.image_button.grid(row=0, column=1, padx=16, pady=16)
 
-        self.load_button = ctk.CTkButton(master=self, text="Load", command=self.load)
+        self.load_button = tk.Button(master=self, text="Load", command=self.load)
         self.load_button.grid(row=1, column=1, padx=16, pady=16)
 
-        self.save_button = ctk.CTkButton(
-            master=self,
-            text="Save",
-            command=self.save,
-            state="disabled",
+        self.save_button = tk.Button(
+            master=self, text="Save", command=self.save, state="disabled"
         )
         self.save_button.grid(row=2, column=1, padx=16, pady=16)
 
-        self.spinner = Spinner(master=self, command=self.change_page, width=140)
+        self.page_no = tk.IntVar()
+        self.spinner = ttk.Spinbox(
+            textvariable=self.page_no,
+            wrap=True,
+            font=FONT_SM,
+            justify="center",
+            state="disabled",
+            command=self.display_page,
+        )
         self.spinner.grid(row=3, column=1, padx=16, pady=16)
 
         self.action = tk.StringVar()
         self.action.set("add")
-        self.radio_add = ctk.CTkRadioButton(
-            master=self,
-            variable=self.action,
-            text="add",
-            value="add",
+        self.radio_add = ttk.Radiobutton(
+            master=self, variable=self.action, text="add", value="add"
         )
-        self.radio_del = ctk.CTkRadioButton(
-            master=self,
-            variable=self.action,
-            text="delete",
-            value="delete",
+        self.radio_del = ttk.Radiobutton(
+            master=self, variable=self.action, text="delete", value="delete"
         )
-        self.radio_clear = ctk.CTkRadioButton(
-            master=self,
-            variable=self.action,
-            text="clear area",
-            value="clear",
+        self.radio_clear = ttk.Radiobutton(
+            master=self, variable=self.action, text="clear area", value="clear"
         )
-        self.radio_treatment = ctk.CTkRadioButton(
-            master=self,
-            variable=self.action,
-            text="treatment start",
-            value="start",
+        self.radio_treatment = ttk.Radiobutton(
+            master=self, variable=self.action, text="treatment start", value="start"
         )
         self.radio_add.grid(row=4, column=1, padx=16, pady=16)
         self.radio_del.grid(row=5, column=1, padx=16, pady=16)
@@ -98,18 +98,10 @@ class App(ctk.CTk):
         self.protocol("WM_DELETE_WINDOW", self.safe_quit)
 
     @property
-    def index(self):
-        return self.spinner.get() - 1
+    def page(self) -> Page:
+        return self.pages[self.page_no.get() - 1]
 
-    @property
-    def page(self):
-        return self.pages[self.index]
-
-    def change_page(self):
-        if self.pages:
-            self.display_page()
-
-    def display_page(self):
+    def display_page(self) -> None:
         canvas_height = self.image_frame.winfo_height()
         self.page.resize(canvas_height)
         self.canvas.delete("all")
@@ -117,7 +109,7 @@ class App(ctk.CTk):
         self.display_page_boxes()
         self.action.set("add")
 
-    def display_page_boxes(self):
+    def display_page_boxes(self) -> None:
         self.clear_page_boxes()
         self.colors = cycle(self.color_list)
         for box in self.page.boxes:
@@ -137,12 +129,12 @@ class App(ctk.CTk):
                 stipple=stipple,
             )
 
-    def clear_page_boxes(self):
+    def clear_page_boxes(self) -> None:
         for i, id_ in enumerate(self.canvas.find_all()):
             if i:  # First object is the page itself
                 self.canvas.delete(id_)
 
-    def on_canvas_press(self, event):
+    def on_canvas_press(self, event: Event) -> None:
         x = self.canvas.canvasx(event.x)
         y = self.canvas.canvasy(event.y)
 
@@ -170,24 +162,24 @@ class App(ctk.CTk):
                 box.start = not box.start
                 self.display_page_boxes()
 
-    def on_canvas_move(self, event):
+    def on_canvas_move(self, event: Event) -> None:
         if self.dragging and self.pages and self.action.get() == "add":
             box = self.page.boxes[-1]
             box.x1 = self.canvas.canvasx(event.x)
             box.y1 = self.canvas.canvasy(event.y)
             self.canvas.coords(box.id, box.x0, box.y0, box.x1, box.y1)
 
-    def on_canvas_release(self, _):
+    def on_canvas_release(self, _: Event) -> None:
         if self.dragging and self.pages and self.action.get() == "add":
             self.page.filter_size()
             self.display_page_boxes()
             self.dragging = False
 
-    def save(self):
+    def save(self) -> None:
         if not self.pages:
             return
 
-        path = tk.filedialog.asksaveasfilename(
+        path = filedialog.asksaveasfilename(
             initialdir=self.curr_dir,
             title="Save image boxes",
             filetypes=(("json", "*.json"), ("all files", "*")),
@@ -205,7 +197,7 @@ class App(ctk.CTk):
         with path.open("w") as out_json:
             json.dump(output, out_json, indent=4)
 
-    def load(self):
+    def load(self) -> None:
         path = filedialog.askopenfilename(
             initialdir=self.curr_dir,
             title="Load image boxes",
@@ -245,10 +237,10 @@ class App(ctk.CTk):
             self.spinner_clear()
             self.canvas.delete("all")
 
-    def setup_canvas(self):
+    def setup_canvas(self) -> None:
         self.update()
 
-        self.canvas = ctk.CTkCanvas(
+        self.canvas = tk.Canvas(
             master=self.image_frame,
             width=self.image_frame.winfo_width(),
             height=self.image_frame.winfo_height(),
@@ -261,7 +253,7 @@ class App(ctk.CTk):
         self.canvas.bind("<B1-Motion>", self.on_canvas_move)
         self.canvas.bind("<ButtonRelease-1>", self.on_canvas_release)
 
-    def get_image_dir(self):
+    def get_image_dir(self) -> None:
         image_dir = filedialog.askdirectory(
             initialdir=self.curr_dir,
             title="Choose image directory",
@@ -296,17 +288,19 @@ class App(ctk.CTk):
             self.spinner_clear()
             self.canvas.delete("all")
 
-    def spinner_update(self, high):
-        self.spinner.low = 1
-        self.spinner.high = high
-        self.spinner.set(1)
+    def spinner_update(self, high: float) -> None:
+        self.page_no.set(1)
+        self.spinner.configure(state="normal")
+        self.spinner.configure(from_=1)
+        self.spinner.configure(to=high)
 
-    def spinner_clear(self):
-        self.spinner.low = 0
-        self.spinner.high = 0
-        self.spinner.set(0)
+    def spinner_clear(self) -> None:
+        self.page_no.set(0)
+        self.spinner.configure(state="disabled")
+        self.spinner.configure(from_=0)
+        self.spinner.configure(to=0)
 
-    def safe_quit(self):
+    def safe_quit(self) -> None:
         if self.dirty:
             yes = messagebox.askyesno(
                 self.title(),
@@ -317,7 +311,7 @@ class App(ctk.CTk):
         self.destroy()
 
 
-def main():
+def main() -> None:
     app = App()
     app.mainloop()
 

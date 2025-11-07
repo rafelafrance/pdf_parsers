@@ -5,12 +5,11 @@ import textwrap
 from pathlib import Path
 
 import rich
-from util.pylib import log
+from pylib import log
 
 
-def main():
+def main(args: argparse.Namespace) -> None:
     log.started()
-    args = parse_args()
 
     paths = sorted(args.image_dir.glob(args.glob))
     for src in paths:
@@ -29,7 +28,7 @@ def main():
     log.finished()
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     arg_parser = argparse.ArgumentParser(
         fromfile_prefix_chars="@",
         description=textwrap.dedent("""Fix image page numbers."""),
@@ -54,4 +53,5 @@ def parse_args():
 
 
 if __name__ == "__main__":
-    main()
+    ARGS = parse_args()
+    main(ARGS)

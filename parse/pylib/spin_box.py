@@ -1,6 +1,6 @@
 from collections.abc import Callable
 
-import customtkinter as ctk
+import tkinter as tk
 
 
 class Spinner(ctk.CTkFrame):
