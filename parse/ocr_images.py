@@ -28,7 +28,7 @@ def main(args: argparse.Namespace) -> None:
 
         for image_path in image_paths:
             console.log(f"[blue]{'=' * 80}")
-            console.log(f"[blue]{image_path}")
+            console.log(f"[blue]{image_path}\n")
 
             handle = client.files.prepare_image(image_path)
             chat = lms.Chat()
