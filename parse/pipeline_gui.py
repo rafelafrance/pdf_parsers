@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import tkinter as tk
+import tkinter.font as tkfont
 from itertools import cycle
 from pathlib import Path
 from tkinter import Event, filedialog, messagebox, ttk
@@ -8,12 +9,6 @@ from typing import ClassVar, LiteralString
 
 from parse.pylib.slice_box import Box
 from parse.pylib.slice_page import Page
-
-FONT = ("DejaVu Sans", 24)
-FONT_SM = ("DejaVu Sans", 16)
-FONT_SM_I = ("DejaVu Sans", 16, "italic")
-FONT_SM_U = ("DejaVu Sans", 16, "underline")
-FONT_SM_UI = ("DejaVu Sans", 16, "underline italic")
 
 
 class App(tk.Tk):
@@ -30,19 +25,24 @@ class App(tk.Tk):
         "gray",
         "pink",
     ]
+    # font: ClassVar[] = ("DejaVu Sans", 24)
 
     def __init__(self) -> None:
         super().__init__()
 
         self.curr_dir = "."
         self.image_dir: Path = Path()
-        self.canvas: tk.Canvas = tk.Canvas()
+        self.canvas: tk.Canvas = None
         self.pages = []
         self.colors = cycle(self.color_list)
         self.dirty = False
         self.dragging = False
 
+        self.geometry("1200x1024")
         self.title("Slice images for OCR")
+
+        self.font = tkfont.Font(family="Arial", size=32)
+        print(tkfont.families())
 
         self.grid_rowconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8), weight=0)
         self.grid_rowconfigure(9, weight=1)
@@ -53,15 +53,24 @@ class App(tk.Tk):
         self.image_frame.grid(row=0, column=0, rowspan=self.row_span, sticky="nsew")
 
         self.image_button = tk.Button(
-            master=self, text="Choose image directory", command=self.get_image_dir
+            master=self,
+            text="Choose image directory",
+            command=self.get_image_dir,
+            font=self.font,
         )
         self.image_button.grid(row=0, column=1, padx=16, pady=16)
 
-        self.load_button = tk.Button(master=self, text="Load", command=self.load)
+        self.load_button = tk.Button(
+            master=self, text="Load", command=self.load, font=self.font
+        )
         self.load_button.grid(row=1, column=1, padx=16, pady=16)
 
         self.save_button = tk.Button(
-            master=self, text="Save", command=self.save, state="disabled"
+            master=self,
+            text="Save",
+            command=self.save,
+            state="disabled",
+            font=self.font,
         )
         self.save_button.grid(row=2, column=1, padx=16, pady=16)
 
@@ -69,7 +78,7 @@ class App(tk.Tk):
         self.spinner = ttk.Spinbox(
             textvariable=self.page_no,
             wrap=True,
-            font=FONT_SM,
+            font=self.font,
             justify="center",
             state="disabled",
             command=self.display_page,
@@ -78,8 +87,13 @@ class App(tk.Tk):
 
         self.action = tk.StringVar()
         self.action.set("add")
+        style = ttk.Style()
+        style.configure("TRadiobutton", font=self.font)
         self.radio_add = ttk.Radiobutton(
-            master=self, variable=self.action, text="add", value="add"
+            master=self,
+            variable=self.action,
+            text="add",
+            value="add",
         )
         self.radio_del = ttk.Radiobutton(
             master=self, variable=self.action, text="delete", value="delete"

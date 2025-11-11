@@ -12,7 +12,6 @@ class Box:
     x1: int = -1
     y1: int = -1
     start: bool = False  # Is this the start of a treatment
-    clear: bool = False  # Are we using this box to clear part of page w/ BG color
 
     def as_dict(self, image_height: int, canvas_height: int) -> dict:
         x0, y0, x1, y1 = self.restore_coords(image_height, canvas_height)
@@ -22,7 +21,6 @@ class Box:
             "x1": x1,
             "y1": y1,
             "start": self.start,
-            "clear": self.clear,
         }
 
     def area(self) -> int:
