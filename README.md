@@ -2,6 +2,15 @@
 
 Utilities to prepare PDF files for OCR.
 
+## Archived
+
+There are many better tools free and easy to use.
+The only 2 scripts left that may possibly be useful are:
+- slice.py
+- stitch.py
+
+If I have a need for them I'll pull them directly into a project.
+
 ## Install
 
 Install the poppler utilities.

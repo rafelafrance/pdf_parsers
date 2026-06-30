@@ -63,7 +63,6 @@ class Page:
                 x1=box["x1"],
                 y1=box["y1"],
                 start=box["start"],
-                clear=box["clear"],
             )
             box.fit_to_canvas(page.image_height, canvas_height)
             page.boxes.append(box)

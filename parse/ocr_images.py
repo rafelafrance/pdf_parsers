@@ -2,6 +2,7 @@
 
 import argparse
 import textwrap
+from datetime import datetime
 from pathlib import Path
 
 import lmstudio as lms
@@ -10,6 +11,8 @@ from rich.console import Console
 PROMPT = (
     "You are given images of text. "
     "I want you to extract all of the text in each image. "
+    "Output the text as plain text using unicode characters. "
+    "Do not output HTML or markdown, just plain text. "
     "Do not hallucinate."
 )
 
@@ -18,8 +21,8 @@ def main(args: argparse.Namespace) -> None:
     image_paths = sorted(args.image_dir.glob("*.jpg"))
 
     console = Console(log_path=False)
-
     console.log("[blue]Started")
+    job_started = datetime.now()
 
     with lms.Client(args.api_host) as client:
         model = client.llm.model(args.model_name)
@@ -27,6 +30,7 @@ def main(args: argparse.Namespace) -> None:
         text = []
 
         for image_path in image_paths:
+            ocr_start = datetime.now()
             console.log(f"[blue]{'=' * 80}")
             console.log(f"[blue]{image_path}\n")
 
@@ -43,6 +47,7 @@ def main(args: argparse.Namespace) -> None:
                 continue
 
             text.append(results)
+            console.log(f"[blue]OCR Time: {datetime.now() - ocr_start}")
             console.log(f"[green]{results}")
 
     with args.ocr_text.open("w") as f:
@@ -51,7 +56,7 @@ def main(args: argparse.Namespace) -> None:
             f.write("\n")
             f.flush()
 
-    console._log_render.omit_repeated_times = False
+    console.log(f"\n[blue]Job Time: {datetime.now() - job_started}")
     console.log("[blue]Finished")
 
 
